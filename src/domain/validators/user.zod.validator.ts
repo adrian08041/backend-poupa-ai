@@ -24,6 +24,13 @@ export class UserZodValidator implements Validator<User> {
           UserZodValidator.name,
         );
       }
+
+      const err = error as Error;
+      throw new ValidatorDomainException(
+        `Error while validating User ${input.getId()}: ${err.message}`,
+        `Os dados para a criação do usuário estão inválidos`,
+        UserZodValidator.name,
+      );
     }
   }
 
@@ -31,7 +38,7 @@ export class UserZodValidator implements Validator<User> {
     const zodSchema = z.object({
       id: z.uuid(),
       email: z.email(),
-      password: z.string().min(8),
+      password: z.string(),
       createdAt: z.date(),
       updatedAt: z.date(),
     });
