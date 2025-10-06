@@ -7,5 +7,6 @@ export class UserNotFoundUsecaseException extends UsecaseException {
     context: string,
   ) {
     super(intertnalMessage, externalMessage, context);
+    this.name = UserNotFoundUsecaseException.name;
   }
 }

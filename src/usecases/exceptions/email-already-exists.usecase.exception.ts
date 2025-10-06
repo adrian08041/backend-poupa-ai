@@ -7,5 +7,6 @@ export class EmailAlreadyExistsUsecaseException extends UsecaseException {
     context: string,
   ) {
     super(internalMessage, externalMessage, context);
+    this.name = EmailAlreadyExistsUsecaseException.name;
   }
 }
