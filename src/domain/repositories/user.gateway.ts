@@ -1,7 +1,7 @@
 import { User } from '../entities/user.entity';
 
-export interface UserGateway {
-  findByEmail(email: string): Promise<User | null>;
-  findById(id: string): Promise<User | null>;
-  create(user: User): Promise<void>;
+export abstract class UserGateway {
+  abstract findByEmail(email: string): Promise<User | null>;
+  abstract findById(id: string): Promise<User | null>;
+  abstract create(user: User): Promise<void>;
 }

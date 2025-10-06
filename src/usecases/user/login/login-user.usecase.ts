@@ -1,3 +1,4 @@
+import { Injectable } from '@nestjs/common';
 import { UserGateway } from 'src/domain/repositories/user.gateway';
 import { JwtService } from 'src/infra/services/jwt/jwt.service';
 import { CredentialsNotValidUsecaseException } from 'src/usecases/exceptions/credentials-not-valid.usecase';
@@ -13,12 +14,12 @@ export type LoginUserOutput = {
   refreshToken: string;
 };
 
-export class LoginUserUseCase
+@Injectable()
+export class LoginUserUsecase
   implements UseCase<LoginUserInput, LoginUserOutput>
 {
   public constructor(
     private readonly userGateway: UserGateway,
-
     private readonly jwtService: JwtService,
   ) {}
 
@@ -30,25 +31,24 @@ export class LoginUserUseCase
 
     if (!anUser) {
       throw new CredentialsNotValidUsecaseException(
-        `User not found while login user with email ${email} in ${LoginUserUseCase.name}.`,
-        `Credenciais inválidas.`,
-        LoginUserUseCase.name,
+        `User not found while login user with email ${email} in ${LoginUserUsecase.name}`,
+        `Credenciais inválidas`,
+        LoginUserUsecase.name,
       );
     }
+
     const isValidPassword = anUser.comparePassword(password);
 
     if (!isValidPassword) {
       throw new CredentialsNotValidUsecaseException(
-        `Password ${password} is not valid while login user with email ${email} in ${LoginUserUseCase.name}.`,
-        `Credenciais inválidas.`,
-        LoginUserUseCase.name,
+        `Password ${password} is not valid for user with email ${email} and id ${anUser.getId()} in ${LoginUserUsecase.name}`,
+        `Credenciais inválidas`,
+        LoginUserUsecase.name,
       );
     }
 
-    const authToken = await this.jwtService.generateAuthToken(anUser.getId());
-    const refreshToken = await this.jwtService.generateRefreshToken(
-      anUser.getId(),
-    );
+    const authToken = this.jwtService.generateAuthToken(anUser.getId());
+    const refreshToken = this.jwtService.generateRefreshToken(anUser.getId());
 
     const output: LoginUserOutput = {
       authToken,
