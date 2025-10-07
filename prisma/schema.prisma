@@ -8,45 +8,45 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Usuario {
-  id          String              @id @default(uuid())
-  nome        String
-  email       String              @unique
-  senha       String
-  role        Role                @default(USER)
-  assinaturas AssinaturaUsuario[] // Relação corrigida
-  created_at  DateTime            @default(now()) @map("created_at")
-  updated_at  DateTime            @updatedAt @map("updated_at")
+ model User {
+  id            String             @id @default(uuid())
+  name          String
+  email         String             @unique
+  password      String
+  role          String             @default("USER")
+  subscriptions UserSubscription[]
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
 
-  @@map("usuario")
+  @@map("user")
 }
 
-model Plano {
-  id                   String              @id @default(uuid())
-  nome                 String
-  preco                Decimal             @db.Decimal(10, 2)
-  ativo                Boolean             @default(true)
-  limite_transacoes    Int
-  relatorios_limitados Boolean             @default(false)
-  assinaturas          AssinaturaUsuario[]
-  created_at           DateTime            @default(now()) @map("created_at")
-  updated_at           DateTime            @updatedAt @map("updated_at")
+model Plan {
+  id                String             @id @default(uuid())
+  name              String
+  price             Decimal            @db.Decimal(10, 2)
+  active            Boolean            @default(true)
+  transaction_limit Int
+  limited_reports   Boolean            @default(false)
+  subscriptions     UserSubscription[]
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
 
-  @@map("planos")
+  @@map("plan")
 }
 
-model AssinaturaUsuario {
-  id         String           @id @default(uuid())
-  usuario_id String
-  plano_id   String
-  status     StatusAssinatura @default(INATIVA)
-  expira_em  DateTime?
-  usuario    Usuario          @relation(fields: [usuario_id], references: [id])
-  plano      Plano            @relation(fields: [plano_id], references: [id])
-  created_at DateTime         @default(now()) @map("created_at")
-  updated_at DateTime         @updatedAt @map("updated_at")
+model UserSubscription {
+  id         String             @id @default(uuid())
+  user_id    String
+  plan_id    String
+  status     SubscriptionStatus @default(INACTIVE)
+  expires_at DateTime?
+  user       User               @relation(fields: [user_id], references: [id])
+  plan       Plan               @relation(fields: [plan_id], references: [id])
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
 
-  @@map("assinaturas_usuarios")
+  @@map("user_subscription")
 }
 
 enum Role {
@@ -54,7 +54,7 @@ enum Role {
   ADMIN
 }
 
-enum StatusAssinatura {
-  ATIVA
-  INATIVA
+enum SubscriptionStatus {
+  ACTIVE
+  INACTIVE
 }
