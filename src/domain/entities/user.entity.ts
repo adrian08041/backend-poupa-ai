@@ -4,7 +4,7 @@ import { UserValidatorFactory } from '../factories/user-validator.factory';
 import { userPasswordValidatorFactory } from '../factories/user-password.validator.factory';
 
 export type UserCreateDto = {
-  name: string;
+  name?: string;
   email: string;
   password: string;
   role?: string;
@@ -12,7 +12,7 @@ export type UserCreateDto = {
 
 export type UserWithDto = {
   id: string;
-  name: string;
+  name: string | null;
   email: string;
   password: string;
   role: string;
@@ -22,7 +22,7 @@ export type UserWithDto = {
 export class User extends Entity {
   private constructor(
     id: string,
-    private name: string,
+    private name: string | null,
     private email: string,
     private password: string,
     private role: string,
@@ -34,7 +34,7 @@ export class User extends Entity {
   }
 
   public static create({
-    name,
+    name = undefined,
     email,
     password,
     role = 'USER',
@@ -49,7 +49,7 @@ export class User extends Entity {
 
     return new User(
       id,
-      name,
+      name ?? null,
       email,
       hashedPassword,
       role,
@@ -63,7 +63,7 @@ export class User extends Entity {
     name,
     email,
     password,
-    role = 'USER',
+    role,
     createdAt,
     updatedAt,
   }: UserWithDto): User {
@@ -74,7 +74,7 @@ export class User extends Entity {
     UserValidatorFactory.create().validate(this);
   }
 
-  public getName(): string {
+  public getName(): string | null {
     return this.name;
   }
 

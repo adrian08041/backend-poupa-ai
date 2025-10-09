@@ -1,3 +1,4 @@
+import { Injectable } from '@nestjs/common';
 import { UserGateway } from 'src/domain/repositories/user.gateway';
 import { UserNotFoundUsecaseException } from 'src/usecases/exceptions/user-not-found.usecase.exception';
 import { UseCase } from 'src/usecases/usecase';
@@ -13,6 +14,7 @@ export type FindUserOutput = {
   updatedAt: Date;
 };
 
+@Injectable()
 export class FindUserUseCase implements UseCase<FindUserInput, FindUserOutput> {
   public constructor(private readonly userGateway: UserGateway) {}
 
