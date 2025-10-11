@@ -9,10 +9,12 @@ import { EmailAlreadyExistsUsecaseExceptionFilterProvider } from './filters/emai
 import { UserNotFoundUsecaseExceptionFilterProvider } from './filters/user-not-found-usecase-exception.filter';
 import { ServiceExceptionFilterProvider } from './filters/service-exception.filter';
 import { RefreshTokenNotValidServiceExceptionFilterProvider } from './filters/refresh-token-not-valid-service-exception.filter';
+import { LoginUserRoute } from './routes/user/login/login-user.route';
+import { RefreshAuthTokenRoute } from './routes/user/refresh/refresh-auth-token.route';
 
 @Module({
   imports: [UsecaseModule],
-  controllers: [CreateUserRoute],
+  controllers: [CreateUserRoute, LoginUserRoute, RefreshAuthTokenRoute],
   providers: [
     ValidatorDomainExceptionFilterProvider,
     DomainExceptionFilterProvider,
