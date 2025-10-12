@@ -1,5 +1,6 @@
 import { ServiceException } from './service.exception';
 
+
 export class AuthTokenNotValidServiceException extends ServiceException {
   public constructor(
     internalMessage: string,

@@ -11,11 +11,20 @@ import { ServiceExceptionFilterProvider } from './filters/service-exception.filt
 import { RefreshTokenNotValidServiceExceptionFilterProvider } from './filters/refresh-token-not-valid-service-exception.filter';
 import { LoginUserRoute } from './routes/user/login/login-user.route';
 import { RefreshAuthTokenRoute } from './routes/user/refresh/refresh-auth-token.route';
+import { FindByIdUserRoute } from './routes/user/find-by-id/find-by-id-user.route';
+import { AuthGuardProvider } from './auth/auth.guard';
+import { ServiceModule } from '../services/service.module';
 
 @Module({
-  imports: [UsecaseModule],
-  controllers: [CreateUserRoute, LoginUserRoute, RefreshAuthTokenRoute],
+  imports: [ServiceModule, UsecaseModule],
+  controllers: [
+    CreateUserRoute,
+    LoginUserRoute,
+    RefreshAuthTokenRoute,
+    FindByIdUserRoute,
+  ],
   providers: [
+    AuthGuardProvider,
     ValidatorDomainExceptionFilterProvider,
     DomainExceptionFilterProvider,
     UsecaseExceptionFilterProvider,
