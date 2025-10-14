@@ -45,9 +45,19 @@ export class UserPrismaRepository extends UserGateway {
   }
 
   public async create(user: User): Promise<void> {
+    // Transformando a entidade User no modelo que o Prisma entende
     const aModel = UserEntityToUserPrismaModelMapper.map(user);
-    await prismaClient.user.create({
-      data: aModel,
-    });
+
+    // 🧩 Log de debug
+    console.log('🧩 Dados enviados para o Prisma:', aModel);
+
+    try {
+      await prismaClient.user.create({
+        data: aModel,
+      });
+      console.log('✅ Usuário criado no banco com sucesso!');
+    } catch (error) {
+      console.error('❌ Erro ao criar usuário no banco:', error);
+    }
   }
 }

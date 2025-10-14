@@ -5,6 +5,7 @@ import { EmailAlreadyExistsUsecaseException } from 'src/usecases/exceptions/emai
 import { UseCase } from 'src/usecases/usecase';
 
 export type CreateUserInput = {
+  name: string;
   email: string;
   password: string;
 };
@@ -19,6 +20,7 @@ export class CreateUserUseCase
   public constructor(private readonly userGateway: UserGateway) {}
 
   public async execute({
+    name,
     email,
     password,
   }: CreateUserInput): Promise<CreateUserOutput> {
@@ -31,7 +33,7 @@ export class CreateUserUseCase
         CreateUserUseCase.name,
       );
     }
-    const anUser = User.create({ email, password });
+    const anUser = User.create({ name, email, password });
 
     await this.userGateway.create(anUser);
 

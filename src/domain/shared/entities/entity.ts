@@ -2,10 +2,10 @@ export abstract class Entity {
   protected id: string;
   protected createdAt: Date;
   protected updatedAt: Date;
-  protected constructor(id: string, createdAt: Date, updateAt: Date) {
+  protected constructor(id: string, createdAt: Date, updatedAt: Date) {
     this.id = id;
     this.createdAt = createdAt;
-    this.updatedAt = updateAt;
+    this.updatedAt = updatedAt;
   }
 
   protected abstract validate(): void;
