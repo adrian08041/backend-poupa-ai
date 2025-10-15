@@ -14,6 +14,8 @@ import { RefreshAuthTokenRoute } from './routes/user/refresh/refresh-auth-token.
 import { FindByIdUserRoute } from './routes/user/find-by-id/find-by-id-user.route';
 import { AuthGuardProvider } from './auth/auth.guard';
 import { ServiceModule } from '../services/service.module';
+import { LogoutUserRoute } from './routes/user/logout/logout-user.route';
+import { LogoutUserUsecase } from 'src/usecases/user/logout/logout-user.usecase';
 
 @Module({
   imports: [ServiceModule, UsecaseModule],
@@ -22,6 +24,7 @@ import { ServiceModule } from '../services/service.module';
     LoginUserRoute,
     RefreshAuthTokenRoute,
     FindByIdUserRoute,
+    LogoutUserRoute,
   ],
   providers: [
     AuthGuardProvider,
@@ -34,6 +37,7 @@ import { ServiceModule } from '../services/service.module';
     UserNotFoundUsecaseExceptionFilterProvider,
     ServiceExceptionFilterProvider,
     RefreshTokenNotValidServiceExceptionFilterProvider,
+    LogoutUserUsecase,
   ],
 })
 export class WebModule {}
