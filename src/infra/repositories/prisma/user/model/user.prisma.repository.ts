@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 
-import { User } from 'src/domain/entities/user.entity';
 import { UserGateway } from 'src/domain/repositories/user.gateway';
 import { prismaClient } from '../../client.prisma';
 import { UserPrismaModelToUserEntityMapper } from './mappers/user-prisma-model-to-user-entity.mapper';
 import { UserEntityToUserPrismaModelMapper } from './mappers/user-entity-to-user-prisma-model.mapper';
+import { User } from 'src/domain/entities/user/user.entity';
 
 @Injectable()
 export class UserPrismaRepository extends UserGateway {

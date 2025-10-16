@@ -15,6 +15,7 @@ model User {
   password      String
   role          String             @default("USER")
   subscriptions UserSubscription[]
+  transactions  Transaction[] 
   createdAt     DateTime           @default(now())
   updatedAt     DateTime           @updatedAt
 
@@ -49,6 +50,27 @@ model UserSubscription {
   @@map("user_subscription")
 }
 
+model Transaction {
+  id          String              @id @default(uuid())
+  userId      String
+  type        TransactionType
+  category    TransactionCategory
+  amount      Int // Em centavos (1050 = R$ 10,50)
+  description String?
+  date        DateTime // Data da transação
+  deletedAt   DateTime? // Soft delete
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([date])
+  @@index([type])
+  @@index([deletedAt])
+  @@map("transaction")
+}
+
 enum Role {
   USER
   ADMIN
@@ -57,4 +79,29 @@ enum Role {
 enum SubscriptionStatus {
   ACTIVE
   INACTIVE
+}
+
+enum TransactionType {
+  INCOME // Receita/Depósito
+  EXPENSE // Despesa/Gasto
+}
+
+enum TransactionCategory {
+  // Categorias de DESPESA
+  ALIMENTACAO
+  TRANSPORTE
+  LAZER
+  SAUDE
+  EDUCACAO
+  MORADIA
+  VESTUARIO
+
+  // Categorias de RECEITA
+  SALARIO
+  FREELANCE
+  INVESTIMENTO
+  PRESENTE
+
+  // Genérico
+  OUTROS
 }

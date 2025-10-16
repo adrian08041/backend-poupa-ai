@@ -1,4 +1,4 @@
-import { User } from '../entities/user.entity';
+import { User } from '../entities/user/user.entity';
 import { Validator } from '../shared/validator/validator';
 import { UserZodValidator } from '../validators/user.zod.validator';
 

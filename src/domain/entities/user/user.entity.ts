@@ -1,7 +1,7 @@
+import { userPasswordValidatorFactory } from 'src/domain/factories/user-password.validator.factory';
+import { UserValidatorFactory } from 'src/domain/factories/user-validator.factory';
+import { Entity } from 'src/domain/shared/entities/entity';
 import { Utils } from 'src/shared/utils/utils';
-import { Entity } from '../shared/entities/entity';
-import { UserValidatorFactory } from '../factories/user-validator.factory';
-import { userPasswordValidatorFactory } from '../factories/user-password.validator.factory';
 
 export type UserCreateDto = {
   name?: string;

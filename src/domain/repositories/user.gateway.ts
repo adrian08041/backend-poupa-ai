@@ -1,4 +1,4 @@
-import { User } from '../entities/user.entity';
+import { User } from '../entities/user/user.entity';
 
 export abstract class UserGateway {
   abstract findByEmail(email: string): Promise<User | null>;

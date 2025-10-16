@@ -1,4 +1,4 @@
-import { ValidatorDomainException } from '../shared/exception/validator-domain.exception';
+import { ValidatorDomainException } from '../../shared/exception/validator-domain.exception';
 import { User } from './user.entity';
 
 describe('Domain > Entities > User', () => {

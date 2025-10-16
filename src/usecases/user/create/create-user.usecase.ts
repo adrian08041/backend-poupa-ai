@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { User } from 'src/domain/entities/user.entity';
+import { User } from 'src/domain/entities/user/user.entity';
+
 import { UserGateway } from 'src/domain/repositories/user.gateway';
 import { EmailAlreadyExistsUsecaseException } from 'src/usecases/exceptions/email-already-exists.usecase.exception';
 import { UseCase } from 'src/usecases/usecase';
