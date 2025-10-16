@@ -56,10 +56,10 @@ model Transaction {
   type          TransactionType
   category      TransactionCategory
   paymentMethod PaymentMethod?
-  amount        Int // Em centavos (1050 = R$ 10,50)
+  amount        Int
   description   String?
-  date          DateTime // Data da transação
-  deletedAt     DateTime? // Soft delete
+  date          DateTime
+  deletedAt     DateTime?
   createdAt     DateTime            @default(now())
   updatedAt     DateTime            @updatedAt
 
@@ -85,6 +85,7 @@ enum SubscriptionStatus {
 enum TransactionType {
   INCOME // Receita/Depósito
   EXPENSE // Despesa/Gasto
+  INVESTMENT // Investimento
 }
 
 enum TransactionCategory {

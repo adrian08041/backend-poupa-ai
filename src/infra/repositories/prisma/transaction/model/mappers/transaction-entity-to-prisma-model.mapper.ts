@@ -1,34 +1,34 @@
-import { Prisma } from 'generated/prisma';
 import { Transaction } from 'src/domain/entities/transaction/transaction.entity';
+import TransactionPrismaModel from '../transaction.prisma.model';
+
+/**
+ * 🔄 MAPPER: Entity → Prisma Model
+ *
+ * PROPÓSITO:
+ * - Converte entidade de domínio (Transaction) para modelo Prisma
+ * - Usado ao SALVAR no banco
+ *
+ * PADRÃO:
+ * - Seguindo UserEntityToUserPrismaModelMapper
+ * - Método estático map()
+ */
 
 export class TransactionEntityToPrismaModelMapper {
-  public static map(
-    entity: Transaction,
-  ): Prisma.TransactionUncheckedCreateInput {
-    return {
-      id: entity.id,
-      userId: entity.userId,
-      amount: entity.amount,
-      description: entity.description ?? null,
-      type: entity.type, // Já é compatível com o enum do Prisma
-      category: entity.category, // Já é compatível com o enum do Prisma
-      date: entity.date,
-      createdAt: entity.createdAt,
-      updatedAt: entity.updatedAt,
-      deletedAt: entity.deletedAt ?? null,
+  public static map(transaction: Transaction): TransactionPrismaModel {
+    const model: TransactionPrismaModel = {
+      id: transaction.getId(),
+      userId: transaction.getUserId(),
+      type: transaction.getType(),
+      category: transaction.getCategory(),
+      paymentMethod: transaction.getPaymentMethod(),
+      amount: transaction.getAmount(),
+      description: transaction.getDescription(),
+      date: transaction.getDate(),
+      deletedAt: transaction.getDeletedAt(),
+      createdAt: transaction.getCreatedAt(),
+      updatedAt: transaction.getUpdatedAt(),
     };
-  }
 
-  public static mapForUpdate(
-    entity: Transaction,
-  ): Prisma.TransactionUncheckedUpdateInput {
-    return {
-      amount: entity.amount,
-      description: entity.description ?? null,
-      type: entity.type,
-      category: entity.category,
-      date: entity.date,
-      updatedAt: new Date(),
-    };
+    return model;
   }
 }

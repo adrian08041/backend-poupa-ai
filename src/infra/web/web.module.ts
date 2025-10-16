@@ -16,6 +16,7 @@ import { AuthGuardProvider } from './auth/auth.guard';
 import { ServiceModule } from '../services/service.module';
 import { LogoutUserRoute } from './routes/user/logout/logout-user.route';
 import { LogoutUserUsecase } from 'src/usecases/user/logout/logout-user.usecase';
+import { CreateTransactionRoute } from './routes/transaction/create/create-transaction.route';
 
 @Module({
   imports: [ServiceModule, UsecaseModule],
@@ -25,6 +26,7 @@ import { LogoutUserUsecase } from 'src/usecases/user/logout/logout-user.usecase'
     RefreshAuthTokenRoute,
     FindByIdUserRoute,
     LogoutUserRoute,
+    CreateTransactionRoute,
   ],
   providers: [
     AuthGuardProvider,
