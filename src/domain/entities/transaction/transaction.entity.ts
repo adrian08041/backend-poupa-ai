@@ -1,10 +1,7 @@
 import { Entity } from 'src/domain/shared/entities/entity';
 import { Utils } from 'src/shared/utils/utils';
-
-/**
- * 📦 ENTIDADE TRANSACTION
- * Seguindo o padrão da entidade User
- */
+import { TransactionValidatorFactory } from 'src/domain/factories/transaction.validator.factory';
+import { ValidatorDomainException } from 'src/domain/shared/exception/validator-domain.exception';
 
 export type TransactionType = 'INCOME' | 'EXPENSE' | 'INVESTMENT';
 
@@ -29,7 +26,6 @@ export type PaymentMethod =
   | 'TRANSFERENCIA'
   | 'DINHEIRO';
 
-// DTO para criar nova transação
 export type TransactionCreateDto = {
   userId: string;
   type: TransactionType;
@@ -40,7 +36,6 @@ export type TransactionCreateDto = {
   date: Date;
 };
 
-// DTO para hidratar do banco
 export type TransactionWithDto = {
   id: string;
   userId: string;
@@ -130,9 +125,24 @@ export class Transaction extends Entity {
   }
 
   protected validate(): void {
-    // Validações de domínio básicas
-    if (this.amount <= 0) {
-      throw new Error('Transaction amount must be greater than zero');
+    const validator = TransactionValidatorFactory.create();
+
+    const result = validator.safeParse({
+      userId: this.userId,
+      type: this.type,
+      category: this.category,
+      paymentMethod: this.paymentMethod,
+      amount: this.amount,
+      description: this.description,
+      date: this.date,
+    });
+
+    if (!result.success) {
+      const firstError = result.error.issues[0];
+      throw new ValidatorDomainException(
+        `Transaction validation failed: ${firstError.path.join('.')} - ${firstError.message}`,
+        firstError.message,
+      );
     }
   }
 

@@ -1,13 +1,16 @@
-import { userPasswordValidatorFactory } from 'src/domain/factories/user-password.validator.factory';
+import { UserPasswordValidatorFactory } from 'src/domain/factories/user-password.validator.factory';
 import { UserValidatorFactory } from 'src/domain/factories/user-validator.factory';
 import { Entity } from 'src/domain/shared/entities/entity';
 import { Utils } from 'src/shared/utils/utils';
+import { UserRole } from './user-role.enum';
+
+export { UserRole };
 
 export type UserCreateDto = {
   name?: string;
   email: string;
   password: string;
-  role?: string;
+  role?: UserRole;
 };
 
 export type UserWithDto = {
@@ -15,17 +18,18 @@ export type UserWithDto = {
   name: string | null;
   email: string;
   password: string;
-  role: string;
+  role: UserRole;
   createdAt: Date;
   updatedAt: Date;
 };
+
 export class User extends Entity {
   private constructor(
     id: string,
     private name: string | null,
     private email: string,
     private password: string,
-    private role: string,
+    private role: UserRole,
     createdAt: Date,
     updatedAt: Date,
   ) {
@@ -37,11 +41,11 @@ export class User extends Entity {
     name = undefined,
     email,
     password,
-    role = 'USER',
+    role = UserRole.USER,
   }: UserCreateDto): User {
     const id = Utils.generateUUID();
 
-    userPasswordValidatorFactory.create().validate(password);
+    UserPasswordValidatorFactory.create().validate(password);
 
     const hashedPassword = Utils.encryptPassword(password);
     const createdAt = new Date();
@@ -86,7 +90,7 @@ export class User extends Entity {
     return this.password;
   }
 
-  public getRole(): string {
+  public getRole(): UserRole {
     return this.role;
   }
 

@@ -36,9 +36,13 @@ export class UserZodValidator implements Validator<User> {
 
   private getZodSchema() {
     const zodSchema = z.object({
-      id: z.uuid(),
-      email: z.email(),
-      password: z.string(),
+      id: z.string().uuid({ message: 'ID deve ser um UUID válido' }),
+      name: z.string().nullable(),
+      email: z.string().email({ message: 'Email deve ser um endereço válido' }),
+      password: z.string().min(1, 'Senha não pode estar vazia'),
+      role: z.enum(['USER', 'ADMIN'], {
+        message: 'Role deve ser USER ou ADMIN',
+      }),
       createdAt: z.date(),
       updatedAt: z.date(),
     });

@@ -19,6 +19,20 @@ import { Transaction } from '../entities/transaction/transaction.entity';
  * - Métodos abstratos que serão implementados pelo PrismaRepository
  */
 
+export type TransactionSummary = {
+  balance: number; // Em centavos
+  totalIncome: number; // Em centavos
+  totalExpense: number; // Em centavos
+  totalInvestment: number; // Em centavos
+};
+
+export type CategorySummary = {
+  category: string;
+  amount: number; // Em centavos
+  percentage: number; // 0-100
+  count: number; // Quantidade de transações
+};
+
 export abstract class TransactionGateway {
   /**
    * Cria uma nova transação no banco
@@ -36,4 +50,26 @@ export abstract class TransactionGateway {
    * Não inclui transações deletadas (deletedAt != null)
    */
   abstract findByUserId(userId: string): Promise<Transaction[]>;
+
+  /**
+   * Atualiza uma transação existente
+   */
+  abstract update(transaction: Transaction): Promise<void>;
+
+  /**
+   * Soft delete: marca transação como deletada (deletedAt = now)
+   */
+  abstract softDelete(id: string): Promise<void>;
+
+  /**
+   * Retorna resumo financeiro do usuário (dashboard)
+   * Calcula: saldo, receitas totais, despesas totais, investimentos totais
+   */
+  abstract getSummaryByUserId(userId: string): Promise<TransactionSummary>;
+
+  /**
+   * Retorna gastos agrupados por categoria (para gráficos)
+   * Apenas transações do tipo EXPENSE
+   */
+  abstract getExpensesByCategory(userId: string): Promise<CategorySummary[]>;
 }

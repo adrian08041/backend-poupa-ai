@@ -1,13 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { Transaction } from 'src/domain/entities/transaction/transaction.entity';
+import {
+  Transaction,
+  TransactionType,
+  TransactionCategory,
+  PaymentMethod,
+} from 'src/domain/entities/transaction/transaction.entity';
 import { TransactionGateway } from 'src/domain/repositories/transaction.gateway';
 import { UseCase } from 'src/usecases/usecase';
 
 export type CreateTransactionInput = {
   userId: string;
-  type: 'INCOME' | 'EXPENSE' | 'INVESTMENT';
-  category: string;
-  paymentMethod?: string;
+  type: TransactionType;
+  category: TransactionCategory;
+  paymentMethod?: PaymentMethod;
   amount: number; // Em centavos
   description?: string;
   date: Date;
@@ -41,9 +46,9 @@ export class CreateTransactionUseCase
   }: CreateTransactionInput): Promise<CreateTransactionOutput> {
     const transaction = Transaction.create({
       userId,
-      type: type as any,
-      category: category as any,
-      paymentMethod: paymentMethod as any,
+      type,
+      category,
+      paymentMethod,
       amount,
       description,
       date,
