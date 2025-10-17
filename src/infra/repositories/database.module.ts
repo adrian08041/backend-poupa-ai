@@ -3,13 +3,19 @@ import { UserPrismaRepositoryProvider } from './prisma/user/model/user.prisma.re
 import { PrismaService } from '../services/database/prisma/prisma.service';
 
 import { TransactionPrismaRepositoryProvider } from './prisma/transaction/transaction.prisma.repository.provider';
+import { MetadataPrismaRepositoryProvider } from './metadata-prisma.provider';
 
 @Module({
   providers: [
     PrismaService,
     UserPrismaRepositoryProvider,
     TransactionPrismaRepositoryProvider,
+    MetadataPrismaRepositoryProvider,
   ],
-  exports: [UserPrismaRepositoryProvider, TransactionPrismaRepositoryProvider],
+  exports: [
+    UserPrismaRepositoryProvider,
+    TransactionPrismaRepositoryProvider,
+    MetadataPrismaRepositoryProvider,
+  ],
 })
 export class DatabaseModule {}

@@ -5,6 +5,7 @@ import { LoginUserUsecase } from './login/login-user.usecase';
 import { Module } from '@nestjs/common';
 import { DatabaseModule } from 'src/infra/repositories/database.module';
 import { ServiceModule } from 'src/infra/services/service.module';
+import { GetEnumsMetadataUsecase } from '../metadata/get-enums/get-enums-metadata.usecase';
 
 @Module({
   imports: [DatabaseModule, ServiceModule],
@@ -13,12 +14,14 @@ import { ServiceModule } from 'src/infra/services/service.module';
     CreateUserUseCase,
     RefreshAuthTokenUserUsecase,
     LoginUserUsecase,
+    GetEnumsMetadataUsecase,
   ],
   exports: [
     FindUserUseCase,
     CreateUserUseCase,
     RefreshAuthTokenUserUsecase,
     LoginUserUsecase,
+    GetEnumsMetadataUsecase,
   ],
 })
 export class UsecaseModule {}

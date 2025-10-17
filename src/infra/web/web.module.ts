@@ -25,6 +25,7 @@ import { DeleteTransactionRoute } from './routes/transaction/delete/delete-trans
 import { UpdateTransactionRoute } from './routes/transaction/update/update-transaction.route';
 import { GetSummaryRoute } from './routes/transaction/summary/get-summary.route';
 import { GetExpensesByCategoryRoute } from './routes/transaction/by-category/get-expenses-by-category.route';
+import { GetEnumsMetadataRoute } from './routes/metadata/get-enums/get-enums-metadata.route';
 
 @Module({
   imports: [ServiceModule, UsecaseModule, TransactionUsecaseModule],
@@ -42,6 +43,8 @@ import { GetExpensesByCategoryRoute } from './routes/transaction/by-category/get
     UpdateTransactionRoute,
     GetSummaryRoute,
     GetExpensesByCategoryRoute,
+    // Metadata routes
+    GetEnumsMetadataRoute,
   ],
   providers: [
     AuthGuardProvider,
