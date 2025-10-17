@@ -1,12 +1,5 @@
 import { z } from 'zod';
 
-/**
- * 🔍 VALIDADOR ZOD PARA TRANSAÇÕES
- *
- * Validações de domínio puro seguindo o padrão do projeto
- * Baseado em: user.zod.validator.ts
- */
-
 const transactionTypeSchema = z.enum(['INCOME', 'EXPENSE', 'INVESTMENT']);
 
 const transactionCategorySchema = z.enum([
@@ -46,13 +39,15 @@ export const TransactionZodValidator = z
       .int('Amount must be an integer (in cents)')
       .positive('Amount must be greater than zero'),
 
-    description: z.string().max(500, 'Description must be at most 500 characters').optional(),
+    description: z
+      .string()
+      .max(500, 'Description must be at most 500 characters')
+      .optional(),
 
     date: z.date(),
   })
   .refine(
     (data) => {
-      // Validação: Categorias de DESPESA apenas para tipo EXPENSE
       const expenseCategories = [
         'ALIMENTACAO',
         'TRANSPORTE',
@@ -81,7 +76,6 @@ export const TransactionZodValidator = z
   )
   .refine(
     (data) => {
-      // Validação: Categorias de RECEITA apenas para tipo INCOME
       const incomeCategories = ['SALARIO', 'FREELANCE', 'PRESENTE'];
 
       if (

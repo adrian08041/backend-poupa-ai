@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-// Não há input para essa rota (é um GET simples)
 export const GetEnumsMetadataInputDtoSchema = z.void();
 
 export const GetEnumsMetadataOutputDtoSchema = z.object({
