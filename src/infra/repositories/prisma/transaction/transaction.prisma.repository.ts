@@ -126,7 +126,8 @@ export class TransactionPrismaRepository extends TransactionGateway {
       }
     });
 
-    const balance = totalIncome - totalExpense - totalInvestment;
+    // Saldo = Receitas - Despesas (investimento não afeta o saldo)
+    const balance = totalIncome - totalExpense;
 
     return {
       balance,

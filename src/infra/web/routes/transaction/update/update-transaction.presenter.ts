@@ -10,7 +10,7 @@ export class UpdateTransactionPresenter {
       type: output.type,
       category: output.category,
       paymentMethod: output.paymentMethod,
-      amount: output.amount,
+      amount: output.amount / 100, // Converte centavos para reais
       description: output.description,
       date: output.date.toISOString(),
       updatedAt: output.updatedAt.toISOString(),

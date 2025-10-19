@@ -8,7 +8,7 @@ export class GetExpensesByCategoryPresenter {
     return {
       categories: output.categories.map((c) => ({
         category: c.category,
-        amount: c.amount,
+        amount: c.amount / 100, // Converte centavos para reais
         percentage: c.percentage,
         count: c.count,
       })),

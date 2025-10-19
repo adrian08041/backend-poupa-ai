@@ -3,7 +3,7 @@ export type TransactionResponseDto = {
   type: 'INCOME' | 'EXPENSE' | 'INVESTMENT';
   category: string;
   paymentMethod?: string;
-  amount: number; // Em centavos
+  amount: number; // Em reais (convertido de centavos no presenter)
   description?: string;
   date: string;
   createdAt: string;

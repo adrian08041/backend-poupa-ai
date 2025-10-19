@@ -12,7 +12,7 @@ export type UpdateTransactionRouteResponse = {
   type: 'INCOME' | 'EXPENSE' | 'INVESTMENT';
   category: string;
   paymentMethod?: string;
-  amount: number;
+  amount: number; // Em reais (convertido de centavos no presenter)
   description?: string;
   date: string;
   updatedAt: string;

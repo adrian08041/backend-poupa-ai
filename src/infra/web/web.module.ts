@@ -15,6 +15,9 @@ import { UnauthorizedTransactionAccessUsecaseExceptionFilterProvider } from './f
 import { LoginUserRoute } from './routes/user/login/login-user.route';
 import { RefreshAuthTokenRoute } from './routes/user/refresh/refresh-auth-token.route';
 import { FindByIdUserRoute } from './routes/user/find-by-id/find-by-id-user.route';
+import { UpdateProfileRoute } from './routes/user/update-profile/update-profile.route';
+import { ChangePasswordRoute } from './routes/user/change-password/change-password.route';
+import { DeleteAccountRoute } from './routes/user/delete-account/delete-account.route';
 import { AuthGuardProvider } from './auth/auth.guard';
 import { ServiceModule } from '../services/service.module';
 import { LogoutUserRoute } from './routes/user/logout/logout-user.route';
@@ -36,6 +39,9 @@ import { GetEnumsMetadataRoute } from './routes/metadata/get-enums/get-enums-met
     RefreshAuthTokenRoute,
     FindByIdUserRoute,
     LogoutUserRoute,
+    UpdateProfileRoute,
+    ChangePasswordRoute,
+    DeleteAccountRoute,
     // Transaction routes
     CreateTransactionRoute,
     ListTransactionsRoute,

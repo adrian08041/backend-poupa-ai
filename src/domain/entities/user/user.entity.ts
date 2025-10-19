@@ -97,4 +97,22 @@ export class User extends Entity {
   public comparePassword(aPassword: string): boolean {
     return Utils.comparePassword(aPassword, this.password);
   }
+
+  public updateName(name: string): void {
+    this.name = name;
+    this.updatedAt = new Date();
+    this.validate();
+  }
+
+  public updateEmail(email: string): void {
+    this.email = email;
+    this.updatedAt = new Date();
+    this.validate();
+  }
+
+  public updatePassword(newPassword: string): void {
+    UserPasswordValidatorFactory.create().validate(newPassword);
+    this.password = Utils.encryptPassword(newPassword);
+    this.updatedAt = new Date();
+  }
 }

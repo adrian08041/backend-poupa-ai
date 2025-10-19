@@ -60,4 +60,28 @@ export class UserPrismaRepository extends UserGateway {
       console.error('❌ Erro ao criar usuário no banco:', error);
     }
   }
+
+  public async update(user: User): Promise<void> {
+    const aModel = UserEntityToUserPrismaModelMapper.map(user);
+
+    await prismaClient.user.update({
+      where: {
+        id: user.getId(),
+      },
+      data: {
+        name: aModel.name,
+        email: aModel.email,
+        password: aModel.password,
+        updatedAt: aModel.updatedAt,
+      },
+    });
+  }
+
+  public async delete(id: string): Promise<void> {
+    await prismaClient.user.delete({
+      where: {
+        id: id,
+      },
+    });
+  }
 }

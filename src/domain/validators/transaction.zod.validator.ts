@@ -96,7 +96,6 @@ export const TransactionZodValidator = z
   )
   .refine(
     (data) => {
-      // Validação: Categoria INVESTIMENTO apenas para tipo INVESTMENT
       if (data.type === 'INVESTMENT' && data.category !== 'INVESTIMENTO') {
         return false;
       }
