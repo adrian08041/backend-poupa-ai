@@ -179,4 +179,30 @@ export class TransactionPrismaRepository extends TransactionGateway {
 
     return summaries;
   }
+
+  public async findByUserIdAndPeriod(
+    userId: string,
+    startDate: Date,
+    endDate: Date,
+  ): Promise<Transaction[]> {
+    const models = await prismaClient.transaction.findMany({
+      where: {
+        userId: userId,
+        deletedAt: null,
+        date: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+      orderBy: {
+        date: 'desc',
+      },
+    });
+
+    const transactions = models.map((model) =>
+      TransactionPrismaModelToEntityMapper.map(model),
+    );
+
+    return transactions;
+  }
 }

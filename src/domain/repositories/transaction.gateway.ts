@@ -72,4 +72,17 @@ export abstract class TransactionGateway {
    * Apenas transações do tipo EXPENSE
    */
   abstract getExpensesByCategory(userId: string): Promise<CategorySummary[]>;
+
+  /**
+   * Busca transações de um usuário em um período específico
+   * @param userId - ID do usuário
+   * @param startDate - Data inicial do período
+   * @param endDate - Data final do período
+   * @returns Array de transações no período
+   */
+  abstract findByUserIdAndPeriod(
+    userId: string,
+    startDate: Date,
+    endDate: Date,
+  ): Promise<Transaction[]>;
 }
