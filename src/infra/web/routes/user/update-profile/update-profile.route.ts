@@ -24,7 +24,6 @@ export class UpdateProfileRoute {
     const input: UpdateProfileInput = {
       userId,
       name: request.name,
-      email: request.email,
     };
 
     const output = await this.updateProfileUsecase.execute(input);

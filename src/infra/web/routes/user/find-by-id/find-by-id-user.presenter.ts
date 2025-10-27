@@ -5,6 +5,7 @@ export class FindByIdUserPresenter {
   public static toHttp(input: FindUserOutput): FindByIdUserResponse {
     const response: FindByIdUserResponse = {
       id: input.id,
+      name: input.name,
       email: input.email,
       createdAt: input.createdAt,
       updatedAt: input.updatedAt,

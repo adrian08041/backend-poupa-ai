@@ -29,6 +29,7 @@ import { UpdateTransactionRoute } from './routes/transaction/update/update-trans
 import { GetSummaryRoute } from './routes/transaction/summary/get-summary.route';
 import { GetExpensesByCategoryRoute } from './routes/transaction/by-category/get-expenses-by-category.route';
 import { GetEnumsMetadataRoute } from './routes/metadata/get-enums/get-enums-metadata.route';
+import { ExtractFromImageRoute } from './routes/transaction/extract-from-image/extract-from-image.route';
 
 @Module({
   imports: [ServiceModule, UsecaseModule, TransactionUsecaseModule],
@@ -49,6 +50,7 @@ import { GetEnumsMetadataRoute } from './routes/metadata/get-enums/get-enums-met
     UpdateTransactionRoute,
     GetSummaryRoute,
     GetExpensesByCategoryRoute,
+    ExtractFromImageRoute,
     // Metadata routes
     GetEnumsMetadataRoute,
   ],

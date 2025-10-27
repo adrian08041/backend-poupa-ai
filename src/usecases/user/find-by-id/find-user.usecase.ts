@@ -9,6 +9,7 @@ export type FindUserInput = {
 
 export type FindUserOutput = {
   id: string;
+  name: string | null;
   email: string;
   createdAt: Date;
   updatedAt: Date;
@@ -31,6 +32,7 @@ export class FindUserUseCase implements UseCase<FindUserInput, FindUserOutput> {
 
     const output: FindUserOutput = {
       id: anUser.getId(),
+      name: anUser.getName(),
       email: anUser.getEmail(),
       createdAt: anUser.getCreatedAt(),
       updatedAt: anUser.getUpdatedAt(),

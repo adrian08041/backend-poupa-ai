@@ -1,31 +1,33 @@
 import { Injectable } from '@nestjs/common';
 import { UserGateway } from 'src/domain/repositories/user.gateway';
+import { JwtService } from 'src/infra/services/jwt/jwt.service';
 import { UseCase } from 'src/usecases/usecase';
 import { UserNotFoundUsecaseException } from 'src/usecases/exceptions/user-not-found.usecase.exception';
-import { EmailAlreadyExistsUsecaseException } from 'src/usecases/exceptions/email-already-exists.usecase.exception';
 
 export type UpdateProfileInput = {
   userId: string;
   name: string;
-  email: string;
 };
 
 export type UpdateProfileOutput = {
   id: string;
   name: string | null;
   email: string;
+  authToken: string;
 };
 
 @Injectable()
 export class UpdateProfileUseCase
   implements UseCase<UpdateProfileInput, UpdateProfileOutput>
 {
-  public constructor(private readonly userGateway: UserGateway) {}
+  public constructor(
+    private readonly userGateway: UserGateway,
+    private readonly jwtService: JwtService,
+  ) {}
 
   public async execute({
     userId,
     name,
-    email,
   }: UpdateProfileInput): Promise<UpdateProfileOutput> {
     const user = await this.userGateway.findById(userId);
 
@@ -37,27 +39,17 @@ export class UpdateProfileUseCase
       );
     }
 
-    // Verificar se o email já está em uso por outro usuário
-    if (email !== user.getEmail()) {
-      const existingUser = await this.userGateway.findByEmail(email);
-      if (existingUser && existingUser.getId() !== userId) {
-        throw new EmailAlreadyExistsUsecaseException(
-          `Email already exists while updating user with email ${email} in ${UpdateProfileUseCase.name}.`,
-          `O e-mail já está em uso por outro usuário.`,
-          UpdateProfileUseCase.name,
-        );
-      }
-    }
-
     user.updateName(name);
-    user.updateEmail(email);
 
     await this.userGateway.update(user);
+
+    const authToken = this.jwtService.generateAuthToken(user.getId());
 
     const output: UpdateProfileOutput = {
       id: user.getId(),
       name: user.getName(),
       email: user.getEmail(),
+      authToken,
     };
 
     return output;

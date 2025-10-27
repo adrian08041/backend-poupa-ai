@@ -7,6 +7,7 @@ export class UpdateProfilePresenter {
       id: output.id,
       name: output.name,
       email: output.email,
+      access_token: output.authToken,
     };
   }
 }
