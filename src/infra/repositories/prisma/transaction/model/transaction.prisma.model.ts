@@ -14,6 +14,7 @@ type TransactionPrismaModel = {
   amount: number; // Em centavos
   description: string | null;
   date: Date;
+  recurringTransactionId: string | null;
   deletedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;

@@ -27,6 +27,7 @@ export class TransactionPrismaModelToEntityMapper {
       amount: model.amount,
       description: model.description,
       date: model.date,
+      recurringTransactionId: model.recurringTransactionId,
       deletedAt: model.deletedAt,
       createdAt: model.createdAt,
       updatedAt: model.updatedAt,

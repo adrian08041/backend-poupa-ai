@@ -174,42 +174,60 @@ export class GenerateReportUsecase
       );
     }
 
-    // 4. Preparar dados para a IA
+    // 4. Preparar dados para a IA (converter centavos para reais)
     const reportData: ReportData = {
       month: input.month,
       year: input.year,
-      totalIncome: currentPeriodData.summary.totalIncome,
-      totalExpenses: currentPeriodData.summary.totalExpenses,
-      totalInvestments: currentPeriodData.summary.totalInvestments,
-      balance: currentPeriodData.summary.balance,
+      totalIncome: currentPeriodData.summary.totalIncome / 100,
+      totalExpenses: currentPeriodData.summary.totalExpenses / 100,
+      totalInvestments: currentPeriodData.summary.totalInvestments / 100,
+      balance: currentPeriodData.summary.balance / 100,
       savingsRate: currentPeriodData.summary.savingsRate,
-      categoryBreakdown: currentPeriodData.categoryBreakdown,
-      paymentMethodBreakdown: currentPeriodData.paymentMethodBreakdown,
-      topExpenses: currentPeriodData.topExpenses,
+      categoryBreakdown: currentPeriodData.categoryBreakdown.map((cat) => ({
+        ...cat,
+        amount: cat.amount / 100,
+      })),
+      paymentMethodBreakdown: currentPeriodData.paymentMethodBreakdown.map(
+        (pm) => ({
+          ...pm,
+          amount: pm.amount / 100,
+        }),
+      ),
+      topExpenses: currentPeriodData.topExpenses.map((exp) => ({
+        ...exp,
+        amount: exp.amount / 100,
+      })),
       transactionCount: currentPeriodData.statistics.transactionCount,
-      averagePerDay: currentPeriodData.statistics.averagePerDay,
+      averagePerDay: currentPeriodData.statistics.averagePerDay / 100,
       maxExpenseDay: currentPeriodData.statistics.maxExpenseDay,
-      maxExpenseAmount: currentPeriodData.statistics.maxExpenseAmount,
+      maxExpenseAmount: currentPeriodData.statistics.maxExpenseAmount / 100,
       daysWithoutExpenses: currentPeriodData.statistics.daysWithoutExpenses,
       comparisonData: comparisonData
         ? {
             previousMonth: comparisonData.previousPeriod.month,
             previousYear: comparisonData.previousPeriod.year,
-            income: comparisonData.income.previous,
-            incomeDifference: comparisonData.income.difference,
+            income: comparisonData.income.previous / 100,
+            incomeDifference: comparisonData.income.difference / 100,
             incomePercentage: comparisonData.income.percentage,
-            expenses: comparisonData.expenses.previous,
-            expensesDifference: comparisonData.expenses.difference,
+            expenses: comparisonData.expenses.previous / 100,
+            expensesDifference: comparisonData.expenses.difference / 100,
             expensesPercentage: comparisonData.expenses.percentage,
-            investments: comparisonData.investments.previous,
-            investmentsDifference: comparisonData.investments.difference,
+            investments: comparisonData.investments.previous / 100,
+            investmentsDifference: comparisonData.investments.difference / 100,
             investmentsPercentage: comparisonData.investments.percentage,
-            balance: comparisonData.balance.previous,
-            balanceDifference: comparisonData.balance.difference,
+            balance: comparisonData.balance.previous / 100,
+            balanceDifference: comparisonData.balance.difference / 100,
             balancePercentage: comparisonData.balance.percentage,
           }
         : undefined,
-      categoryComparison: categoryComparison || undefined,
+      categoryComparison: categoryComparison
+        ? categoryComparison.map((cat) => ({
+            ...cat,
+            currentAmount: cat.currentAmount / 100,
+            previousAmount: cat.previousAmount / 100,
+            difference: cat.difference / 100,
+          }))
+        : undefined,
       isFirstReport: !input.includeComparison || !comparisonData,
       trend: this.determineTrend(comparisonData),
       hasRegularInvestments: currentPeriodData.summary.totalInvestments > 0,

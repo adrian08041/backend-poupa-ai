@@ -96,6 +96,29 @@ export class TransactionPrismaRepository extends TransactionGateway {
     });
   }
 
+  public async softDeleteByRecurringTransactionId(
+    recurringTransactionId: string,
+  ): Promise<void> {
+    console.log(
+      `🗑️  Deletando transações vinculadas à recurring: ${recurringTransactionId}`,
+    );
+
+    const result = await prismaClient.transaction.updateMany({
+      where: {
+        recurringTransactionId: recurringTransactionId,
+        deletedAt: null, // Apenas transações não deletadas
+      },
+      data: {
+        deletedAt: new Date(),
+        updatedAt: new Date(),
+      },
+    });
+
+    console.log(
+      `✅ ${result.count} transações deletadas para recurring ${recurringTransactionId}`,
+    );
+  }
+
   public async getSummaryByUserId(
     userId: string,
   ): Promise<TransactionSummary> {

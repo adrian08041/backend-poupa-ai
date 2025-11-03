@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { CreateUserRoute } from './routes/user/create/create-user.route';
 import { UsecaseModule } from 'src/usecases/user/usecase.module';
 import { TransactionUsecaseModule } from 'src/usecases/transaction/usecase.module';
+import { RecurringTransactionUsecaseModule } from 'src/usecases/recurring-transaction/usecase.module';
 import { ValidatorDomainExceptionFilterProvider } from './filters/validator-domain.exception.filter';
 import { DomainExceptionFilterProvider } from './filters/domain-exception.filter';
 import { UsecaseExceptionFilterProvider } from './filters/usecase-exception.filter';
@@ -12,6 +13,7 @@ import { ServiceExceptionFilterProvider } from './filters/service-exception.filt
 import { RefreshTokenNotValidServiceExceptionFilterProvider } from './filters/refresh-token-not-valid-service-exception.filter';
 import { TransactionNotFoundUsecaseExceptionFilterProvider } from './filters/transaction-not-found-usecase-exception.filter';
 import { UnauthorizedTransactionAccessUsecaseExceptionFilterProvider } from './filters/unauthorized-transaction-access-usecase-exception.filter';
+import { RecurringTransactionNotEditableUsecaseExceptionFilterProvider } from './filters/recurring-transaction-not-editable-usecase-exception.filter';
 import { LoginUserRoute } from './routes/user/login/login-user.route';
 import { RefreshAuthTokenRoute } from './routes/user/refresh/refresh-auth-token.route';
 import { FindByIdUserRoute } from './routes/user/find-by-id/find-by-id-user.route';
@@ -31,9 +33,10 @@ import { GetExpensesByCategoryRoute } from './routes/transaction/by-category/get
 import { GetEnumsMetadataRoute } from './routes/metadata/get-enums/get-enums-metadata.route';
 import { ExtractFromImageRoute } from './routes/transaction/extract-from-image/extract-from-image.route';
 import { GenerateReportRoute } from './routes/transaction/generate-report/generate-report.route';
+import { RecurringTransactionModule } from './routes/recurring-transaction/recurring-transaction.module';
 
 @Module({
-  imports: [ServiceModule, UsecaseModule, TransactionUsecaseModule],
+  imports: [ServiceModule, UsecaseModule, TransactionUsecaseModule, RecurringTransactionUsecaseModule, RecurringTransactionModule],
   controllers: [
     // User routes
     CreateUserRoute,
@@ -68,6 +71,7 @@ import { GenerateReportRoute } from './routes/transaction/generate-report/genera
     // Transaction exception filters
     TransactionNotFoundUsecaseExceptionFilterProvider,
     UnauthorizedTransactionAccessUsecaseExceptionFilterProvider,
+    RecurringTransactionNotEditableUsecaseExceptionFilterProvider,
     // Service exception filters
     ServiceExceptionFilterProvider,
     RefreshTokenNotValidServiceExceptionFilterProvider,

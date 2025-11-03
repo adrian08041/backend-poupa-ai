@@ -62,6 +62,14 @@ export abstract class TransactionGateway {
   abstract softDelete(id: string): Promise<void>;
 
   /**
+   * Soft delete de todas as transações vinculadas a uma recurring transaction
+   * @param recurringTransactionId - ID da transação recorrente
+   */
+  abstract softDeleteByRecurringTransactionId(
+    recurringTransactionId: string,
+  ): Promise<void>;
+
+  /**
    * Retorna resumo financeiro do usuário (dashboard)
    * Calcula: saldo, receitas totais, despesas totais, investimentos totais
    */

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { TransactionGateway } from 'src/domain/repositories/transaction.gateway';
 import { UseCase } from 'src/usecases/usecase';
+import { ProcessRecurringTransactionsUseCase } from 'src/usecases/recurring-transaction/process/process-recurring-transactions.usecase';
 
 export type GetSummaryInput = {
   userId: string;
@@ -17,11 +18,17 @@ export type GetSummaryOutput = {
 export class GetSummaryUseCase
   implements UseCase<GetSummaryInput, GetSummaryOutput>
 {
-  public constructor(private readonly transactionGateway: TransactionGateway) {}
+  public constructor(
+    private readonly transactionGateway: TransactionGateway,
+    private readonly processRecurringTransactionsUseCase: ProcessRecurringTransactionsUseCase,
+  ) {}
 
   public async execute({
     userId,
   }: GetSummaryInput): Promise<GetSummaryOutput> {
+    // Processa transações recorrentes antes de calcular o summary
+    await this.processRecurringTransactionsUseCase.execute({ userId });
+
     const summary = await this.transactionGateway.getSummaryByUserId(userId);
 
     return {

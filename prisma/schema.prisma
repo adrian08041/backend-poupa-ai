@@ -9,15 +9,16 @@ datasource db {
 }
 
 model User {
-  id            String             @id @default(uuid())
-  name          String?
-  email         String             @unique
-  password      String
-  role          String             @default("USER")
-  subscriptions UserSubscription[]
-  transactions  Transaction[]
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
+  id                    String                 @id @default(uuid())
+  name                  String?
+  email                 String                 @unique
+  password              String
+  role                  String                 @default("USER")
+  subscriptions         UserSubscription[]
+  transactions          Transaction[]
+  recurringTransactions RecurringTransaction[]
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
 
   @@map("user")
 }
@@ -51,6 +52,31 @@ model UserSubscription {
 }
 
 model Transaction {
+  id                     String              @id @default(uuid())
+  userId                 String
+  type                   TransactionType
+  category               TransactionCategory
+  paymentMethod          PaymentMethod?
+  amount                 Int
+  description            String?
+  date                   DateTime
+  deletedAt              DateTime?
+  recurringTransactionId String?
+  createdAt              DateTime            @default(now())
+  updatedAt              DateTime            @updatedAt
+
+  user                 User                  @relation(fields: [userId], references: [id])
+  recurringTransaction RecurringTransaction? @relation(fields: [recurringTransactionId], references: [id])
+
+  @@index([userId])
+  @@index([date])
+  @@index([type])
+  @@index([deletedAt])
+  @@index([recurringTransactionId])
+  @@map("transaction")
+}
+
+model RecurringTransaction {
   id            String              @id @default(uuid())
   userId        String
   type          TransactionType
@@ -58,18 +84,25 @@ model Transaction {
   paymentMethod PaymentMethod?
   amount        Int
   description   String?
-  date          DateTime
+  frequency     RecurrenceFrequency
+  startDate     DateTime
+  endDate       DateTime?
+  dayOfMonth    Int? // Para mensais: dia do mês (1-31)
+  dayOfWeek     Int? // Para semanais: dia da semana (0-6, sendo 0 domingo)
+  active        Boolean             @default(true)
+  lastProcessed DateTime?
   deletedAt     DateTime?
   createdAt     DateTime            @default(now())
   updatedAt     DateTime            @updatedAt
 
-  user User @relation(fields: [userId], references: [id])
+  user         User          @relation(fields: [userId], references: [id])
+  transactions Transaction[]
 
   @@index([userId])
-  @@index([date])
-  @@index([type])
+  @@index([active])
+  @@index([frequency])
   @@index([deletedAt])
-  @@map("transaction")
+  @@map("recurring_transaction")
 }
 
 enum Role {
@@ -114,4 +147,11 @@ enum PaymentMethod {
   CARTAO
   TRANSFERENCIA
   DINHEIRO
+}
+
+enum RecurrenceFrequency {
+  DAILY // Diário
+  WEEKLY // Semanal
+  MONTHLY // Mensal
+  YEARLY // Anual
 }

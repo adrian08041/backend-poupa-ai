@@ -22,6 +22,7 @@ const transactionCategorySchema = z.enum([
 
 const paymentMethodSchema = z
   .enum(['PIX', 'BOLETO', 'CARTAO', 'TRANSFERENCIA', 'DINHEIRO'])
+  .nullable()
   .optional();
 
 export const TransactionZodValidator = z
@@ -42,6 +43,7 @@ export const TransactionZodValidator = z
     description: z
       .string()
       .max(500, 'Description must be at most 500 characters')
+      .nullable()
       .optional(),
 
     date: z.date(),

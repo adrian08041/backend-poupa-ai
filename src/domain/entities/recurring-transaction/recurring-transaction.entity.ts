@@ -1,7 +1,9 @@
 import { Entity } from 'src/domain/shared/entities/entity';
 import { Utils } from 'src/shared/utils/utils';
-import { TransactionValidatorFactory } from 'src/domain/factories/transaction.validator.factory';
+import { RecurringTransactionValidatorFactory } from 'src/domain/factories/recurring-transaction.validator.factory';
 import { ValidatorDomainException } from 'src/domain/shared/exception/validator-domain.exception';
+
+export type RecurrenceFrequency = 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'YEARLY';
 
 export type TransactionType = 'INCOME' | 'EXPENSE' | 'INVESTMENT';
 
@@ -26,18 +28,21 @@ export type PaymentMethod =
   | 'TRANSFERENCIA'
   | 'DINHEIRO';
 
-export type TransactionCreateDto = {
+export type RecurringTransactionCreateDto = {
   userId: string;
   type: TransactionType;
   category: TransactionCategory;
   paymentMethod?: PaymentMethod;
   amount: number; // Em centavos
   description?: string;
-  date: Date;
-  recurringTransactionId?: string;
+  frequency: RecurrenceFrequency;
+  startDate: Date;
+  endDate?: Date;
+  dayOfMonth?: number; // 1-31 para MONTHLY
+  dayOfWeek?: number; // 0-6 para WEEKLY (0 = domingo)
 };
 
-export type TransactionWithDto = {
+export type RecurringTransactionWithDto = {
   id: string;
   userId: string;
   type: TransactionType;
@@ -45,14 +50,19 @@ export type TransactionWithDto = {
   paymentMethod: PaymentMethod | null;
   amount: number; // Em centavos
   description: string | null;
-  date: Date;
-  recurringTransactionId: string | null;
+  frequency: RecurrenceFrequency;
+  startDate: Date;
+  endDate: Date | null;
+  dayOfMonth: number | null;
+  dayOfWeek: number | null;
+  active: boolean;
+  lastProcessed: Date | null;
   deletedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
 };
 
-export class Transaction extends Entity {
+export class RecurringTransaction extends Entity {
   private constructor(
     id: string,
     private userId: string,
@@ -61,8 +71,13 @@ export class Transaction extends Entity {
     private paymentMethod: PaymentMethod | null,
     private amount: number,
     private description: string | null,
-    private date: Date,
-    private recurringTransactionId: string | null,
+    private frequency: RecurrenceFrequency,
+    private startDate: Date,
+    private endDate: Date | null,
+    private dayOfMonth: number | null,
+    private dayOfWeek: number | null,
+    private active: boolean,
+    private lastProcessed: Date | null,
     private deletedAt: Date | null,
     createdAt: Date,
     updatedAt: Date,
@@ -78,14 +93,17 @@ export class Transaction extends Entity {
     paymentMethod = undefined,
     amount,
     description = undefined,
-    date,
-    recurringTransactionId = undefined,
-  }: TransactionCreateDto): Transaction {
+    frequency,
+    startDate,
+    endDate = undefined,
+    dayOfMonth = undefined,
+    dayOfWeek = undefined,
+  }: RecurringTransactionCreateDto): RecurringTransaction {
     const id = Utils.generateUUID();
     const createdAt = new Date();
     const updatedAt = new Date();
 
-    return new Transaction(
+    return new RecurringTransaction(
       id,
       userId,
       type,
@@ -93,8 +111,13 @@ export class Transaction extends Entity {
       paymentMethod ?? null,
       amount,
       description ?? null,
-      date,
-      recurringTransactionId ?? null,
+      frequency,
+      startDate,
+      endDate ?? null,
+      dayOfMonth ?? null,
+      dayOfWeek ?? null,
+      true, // active
+      null, // lastProcessed
       null, // deletedAt
       createdAt,
       updatedAt,
@@ -109,13 +132,18 @@ export class Transaction extends Entity {
     paymentMethod,
     amount,
     description,
-    date,
-    recurringTransactionId,
+    frequency,
+    startDate,
+    endDate,
+    dayOfMonth,
+    dayOfWeek,
+    active,
+    lastProcessed,
     deletedAt,
     createdAt,
     updatedAt,
-  }: TransactionWithDto): Transaction {
-    return new Transaction(
+  }: RecurringTransactionWithDto): RecurringTransaction {
+    return new RecurringTransaction(
       id,
       userId,
       type,
@@ -123,8 +151,13 @@ export class Transaction extends Entity {
       paymentMethod,
       amount,
       description,
-      date,
-      recurringTransactionId,
+      frequency,
+      startDate,
+      endDate,
+      dayOfMonth,
+      dayOfWeek,
+      active,
+      lastProcessed,
       deletedAt,
       createdAt,
       updatedAt,
@@ -132,7 +165,7 @@ export class Transaction extends Entity {
   }
 
   protected validate(): void {
-    const validator = TransactionValidatorFactory.create();
+    const validator = RecurringTransactionValidatorFactory.create();
 
     const result = validator.safeParse({
       userId: this.userId,
@@ -141,18 +174,23 @@ export class Transaction extends Entity {
       paymentMethod: this.paymentMethod,
       amount: this.amount,
       description: this.description,
-      date: this.date,
+      frequency: this.frequency,
+      startDate: this.startDate,
+      endDate: this.endDate,
+      dayOfMonth: this.dayOfMonth,
+      dayOfWeek: this.dayOfWeek,
     });
 
     if (!result.success) {
       const firstError = result.error.issues[0];
       throw new ValidatorDomainException(
-        `Transaction validation failed: ${firstError.path.join('.')} - ${firstError.message}`,
+        `RecurringTransaction validation failed: ${firstError.path.join('.')} - ${firstError.message}`,
         firstError.message,
       );
     }
   }
 
+  // Getters
   public getUserId(): string {
     return this.userId;
   }
@@ -177,15 +215,52 @@ export class Transaction extends Entity {
     return this.description;
   }
 
-  public getDate(): Date {
-    return this.date;
+  public getFrequency(): RecurrenceFrequency {
+    return this.frequency;
   }
 
-  public getRecurringTransactionId(): string | null {
-    return this.recurringTransactionId;
+  public getStartDate(): Date {
+    return this.startDate;
+  }
+
+  public getEndDate(): Date | null {
+    return this.endDate;
+  }
+
+  public getDayOfMonth(): number | null {
+    return this.dayOfMonth;
+  }
+
+  public getDayOfWeek(): number | null {
+    return this.dayOfWeek;
+  }
+
+  public isActive(): boolean {
+    return this.active;
+  }
+
+  public getLastProcessed(): Date | null {
+    return this.lastProcessed;
   }
 
   public getDeletedAt(): Date | null {
     return this.deletedAt;
+  }
+
+  // Métodos de modificação
+  public deactivate(): void {
+    this.active = false;
+  }
+
+  public activate(): void {
+    this.active = true;
+  }
+
+  public markAsProcessed(date: Date): void {
+    this.lastProcessed = date;
+  }
+
+  public softDelete(): void {
+    this.deletedAt = new Date();
   }
 }

@@ -24,6 +24,7 @@ export class TransactionEntityToPrismaModelMapper {
       amount: transaction.getAmount(),
       description: transaction.getDescription(),
       date: transaction.getDate(),
+      recurringTransactionId: transaction.getRecurringTransactionId(),
       deletedAt: transaction.getDeletedAt(),
       createdAt: transaction.getCreatedAt(),
       updatedAt: transaction.getUpdatedAt(),

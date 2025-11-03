@@ -3,6 +3,7 @@ import { TransactionGateway } from 'src/domain/repositories/transaction.gateway'
 import { UseCase } from 'src/usecases/usecase';
 import { TransactionNotFoundUsecaseException } from 'src/usecases/exceptions/transaction-not-found.usecase.exception';
 import { UnauthorizedTransactionAccessUsecaseException } from 'src/usecases/exceptions/unauthorized-transaction-access.usecase.exception';
+import { RecurringTransactionNotEditableUsecaseException } from 'src/usecases/exceptions/recurring-transaction-not-editable.usecase.exception';
 
 export type DeleteTransactionInput = {
   transactionId: string;
@@ -40,7 +41,12 @@ export class DeleteTransactionUseCase
       );
     }
 
-    // 4. Soft delete
+    // 4. Verifica se é uma transação gerada por recorrência (não pode ser deletada)
+    if (transaction.getRecurringTransactionId()) {
+      throw new RecurringTransactionNotEditableUsecaseException(transactionId);
+    }
+
+    // 5. Soft delete
     await this.transactionGateway.softDelete(transactionId);
 
     return {
