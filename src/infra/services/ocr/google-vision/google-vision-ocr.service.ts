@@ -12,9 +12,28 @@ export class GoogleVisionOcrService extends OcrService {
   constructor() {
     super();
     // Inicializa o cliente do Google Vision
-    // As credenciais são carregadas automaticamente da variável de ambiente
-    // GOOGLE_APPLICATION_CREDENTIALS
-    this.client = new ImageAnnotatorClient();
+    // Suporta duas formas de configuração:
+    // 1. GOOGLE_CREDENTIALS_JSON - JSON completo (para produção/Railway)
+    // 2. GOOGLE_APPLICATION_CREDENTIALS - caminho do arquivo (para desenvolvimento local)
+
+    const credentialsJson = process.env.GOOGLE_CREDENTIALS_JSON;
+
+    if (credentialsJson) {
+      console.log('🔑 Usando credenciais do Google Cloud via GOOGLE_CREDENTIALS_JSON');
+      try {
+        const credentials = JSON.parse(credentialsJson);
+        this.client = new ImageAnnotatorClient({
+          credentials,
+        });
+      } catch (error) {
+        console.error('❌ Erro ao fazer parse das credenciais JSON:', error);
+        throw new Error('GOOGLE_CREDENTIALS_JSON contém JSON inválido');
+      }
+    } else {
+      console.log('🔑 Usando credenciais do Google Cloud via GOOGLE_APPLICATION_CREDENTIALS');
+      // Fallback para o método padrão (arquivo)
+      this.client = new ImageAnnotatorClient();
+    }
   }
 
   /**
