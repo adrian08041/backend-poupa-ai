@@ -17,6 +17,13 @@ export class AuthGuard implements CanActivate {
   ) {}
 
   public canActivate(context: ExecutionContext): boolean {
+    const request = context.switchToHttp().getRequest<Request>();
+
+    // Permite requisições OPTIONS (CORS preflight) sem autenticação
+    if (request.method === 'OPTIONS') {
+      return true;
+    }
+
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC, [
       context.getHandler(),
       context.getClass(),
@@ -25,8 +32,6 @@ export class AuthGuard implements CanActivate {
     if (isPublic) {
       return true;
     }
-
-    const request = context.switchToHttp().getRequest<Request>();
     const token = this.exctractTokenFromRequest(request);
 
     if (!token) {
