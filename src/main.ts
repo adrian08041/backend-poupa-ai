@@ -10,29 +10,40 @@ async function bootstrap() {
       origin: string | undefined,
       callback: (err: Error | null, allow?: boolean) => void,
     ) => {
+      // Aceita requisições sem origin (ex: Postman, curl, ferramentas internas)
+      if (!origin) {
+        console.log('✅ CORS: Permitindo requisição sem origin');
+        return callback(null, true);
+      }
+
+      console.log(`🔍 CORS: Verificando origem: ${origin}`);
+
+      // Lista de origens explicitamente permitidas
       const allowedOrigins = [
         'http://localhost:3000',
         'https://frontend-poupa-ai.vercel.app',
         process.env.FRONTEND_URL,
-      ].filter(Boolean);
-
-      // Aceita requisições sem origin (ex: Postman, curl)
-      if (!origin) {
-        return callback(null, true);
-      }
+      ].filter((o) => o !== undefined && o !== null && o !== '');
 
       // Aceita qualquer domínio vercel.app (preview deployments)
       if (origin.endsWith('.vercel.app')) {
+        console.log(`✅ CORS: Permitindo origem Vercel: ${origin}`);
         return callback(null, true);
       }
 
       // Verifica lista de origens permitidas
       if (allowedOrigins.includes(origin)) {
+        console.log(`✅ CORS: Origem permitida: ${origin}`);
         return callback(null, true);
       }
 
-      console.warn(`⚠️  CORS bloqueou origem: ${origin}`);
-      return callback(new Error('Not allowed by CORS'));
+      // IMPORTANTE: Mesmo bloqueando, retorna true para permitir headers CORS
+      // O navegador decide se aceita baseado nos headers retornados
+      console.log(`⚠️  CORS: Origem não permitida, mas enviando headers: ${origin}`);
+      console.log(`📋 Origens configuradas: ${allowedOrigins.join(', ')}`);
+
+      // MUDANÇA CRÍTICA: Retorna false em vez de Error para permitir headers CORS
+      return callback(null, false);
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'],
