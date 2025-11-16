@@ -4,71 +4,52 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // CORS - aceita frontend local e em produção
+  // Lista de origens permitidas
+  const allowedOrigins = [
+    'http://localhost:3000', // Sua aplicação frontend local
+    'https://frontend-poupa-ai.vercel.app', // Seu frontend em produção
+  ];
+
+  // Adiciona a URL do ambiente se ela existir
+  if (process.env.FRONTEND_URL) {
+    allowedOrigins.push(process.env.FRONTEND_URL);
+  }
+
+  // Configuração de CORS simplificada e correta
   app.enableCors({
-    origin: (
-      origin: string | undefined,
-      callback: (err: Error | null, allow?: boolean) => void,
-    ) => {
-      // Aceita requisições sem origin (ex: Postman, curl, ferramentas internas)
+    origin: (origin, callback) => {
+      // Permite requisições sem 'origin' (como Postman, apps mobile, etc.)
       if (!origin) {
-        console.log('✅ CORS: Permitindo requisição sem origin');
         return callback(null, true);
       }
 
-      console.log(`🔍 CORS: Verificando origem: ${origin}`);
-
-      // Lista de origens explicitamente permitidas
-      const allowedOrigins = [
-        'http://localhost:3000',
-        'https://frontend-poupa-ai.vercel.app',
-        process.env.FRONTEND_URL,
-      ].filter((o) => o !== undefined && o !== null && o !== '');
-
-      // Aceita qualquer domínio vercel.app (preview deployments)
+      // Permite qualquer subdomínio de vercel.app (útil para deploy previews)
       if (origin.endsWith('.vercel.app')) {
-        console.log(`✅ CORS: Permitindo origem Vercel: ${origin}`);
         return callback(null, true);
       }
 
-      // Verifica lista de origens permitidas
-      if (allowedOrigins.includes(origin)) {
-        console.log(`✅ CORS: Origem permitida: ${origin}`);
-        return callback(null, true);
+      // Verifica se a origem está na lista de permitidas
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        // Se a origem não for permitida, recusa a requisição
+        callback(new Error('Not allowed by CORS'));
       }
-
-      // IMPORTANTE: Mesmo bloqueando, retorna true para permitir headers CORS
-      // O navegador decide se aceita baseado nos headers retornados
-      console.log(`⚠️  CORS: Origem não permitida, mas enviando headers: ${origin}`);
-      console.log(`📋 Origens configuradas: ${allowedOrigins.join(', ')}`);
-
-      // MUDANÇA CRÍTICA: Retorna false em vez de Error para permitir headers CORS
-      return callback(null, false);
     },
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'],
-    allowedHeaders: [
-      'Content-Type',
-      'Authorization',
-      'Accept',
-      'Origin',
-      'X-Requested-With',
-    ],
-    exposedHeaders: ['Content-Type', 'Authorization'],
-    preflightContinue: false,
-    optionsSuccessStatus: 204,
-    maxAge: 86400, // Cache preflight por 24h
   });
 
   // Prefixo padrão das rotas
   app.setGlobalPrefix('api');
 
-  // 🔧 Altere a porta do backend para 3001
-  const port = process.env.PORT ?? 3001;
+  // A porta para Railway é fornecida pela variável de ambiente PORT
+  const port = process.env.PORT || 3001;
 
-  // Em produção (containers), precisa fazer bind em 0.0.0.0
+  // Em ambientes de container (como Railway e Docker), é essencial usar '0.0.0.0'
   await app.listen(port, '0.0.0.0');
 
-  console.log(`🚀 Backend rodando em: http://localhost:${port}/api`);
+  console.log(`🚀 Backend rodando em: http://localhost:${port}`);
+  console.log(`🔗 Escutando na porta ${port} em 0.0.0.0`);
 }
 bootstrap();
