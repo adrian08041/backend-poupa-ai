@@ -13,4 +13,4 @@ cmds = ["npm run build"]
 
 [start]
 # Agora só aplica migrate e inicia o dist
-cmd = "npx prisma migrate deploy && node dist/main"
+cmd = "npx prisma migrate deploy && node dist/src/main"
