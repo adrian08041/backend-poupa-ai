@@ -7,7 +7,8 @@ async function bootstrap() {
   // CORS - aceita frontend local e em produção
   const allowedOrigins = [
     'http://localhost:3000',
-    process.env.FRONTEND_URL, // URL do Vercel
+    'https://frontend-poupa-ai.vercel.app',
+    process.env.FRONTEND_URL, // URL customizada (opcional)
   ].filter(Boolean);
 
   app.enableCors({
