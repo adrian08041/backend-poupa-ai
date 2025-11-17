@@ -14,6 +14,7 @@ model User {
   email                 String                 @unique
   password              String
   role                  String                 @default("USER")
+  whatsappAccounts      UserWhatsApp[]
   subscriptions         UserSubscription[]
   transactions          Transaction[]
   recurringTransactions RecurringTransaction[]
@@ -21,6 +22,20 @@ model User {
   updatedAt             DateTime               @updatedAt
 
   @@map("user")
+}
+
+model UserWhatsApp {
+  id        String   @id @default(uuid())
+  userId    String
+  whatsapp  String   @unique
+  active    Boolean  @default(true)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([whatsapp])
+  @@map("user_whatsapp")
 }
 
 model Plan {
