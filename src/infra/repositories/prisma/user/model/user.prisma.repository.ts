@@ -45,11 +45,30 @@ export class UserPrismaRepository extends UserGateway {
   }
 
   public async findByWhatsappNumber(whatsappNumber: string): Promise<User | null> {
-    const aModel = await prismaClient.user.findUnique({
+    // 1. Tenta busca exata
+    let aModel = await prismaClient.user.findUnique({
       where: {
         whatsappNumber: whatsappNumber,
       },
     });
+
+    // 2. Se não achou e tem +, tenta sem +
+    if (!aModel && whatsappNumber.startsWith('+')) {
+      aModel = await prismaClient.user.findUnique({
+        where: {
+          whatsappNumber: whatsappNumber.substring(1),
+        },
+      });
+    }
+
+    // 3. Se não achou e não tem +, tenta com +
+    if (!aModel && !whatsappNumber.startsWith('+')) {
+      aModel = await prismaClient.user.findUnique({
+        where: {
+          whatsappNumber: `+${whatsappNumber}`,
+        },
+      });
+    }
 
     if (!aModel) {
       return null;
