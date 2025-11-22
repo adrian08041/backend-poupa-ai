@@ -44,6 +44,22 @@ export class UserPrismaRepository extends UserGateway {
     return anUser;
   }
 
+  public async findByWhatsappNumber(whatsappNumber: string): Promise<User | null> {
+    const aModel = await prismaClient.user.findUnique({
+      where: {
+        whatsappNumber: whatsappNumber,
+      },
+    });
+
+    if (!aModel) {
+      return null;
+    }
+
+    const anUser = UserPrismaModelToUserEntityMapper.map(aModel);
+
+    return anUser;
+  }
+
   public async create(user: User): Promise<void> {
     // Transformando a entidade User no modelo que o Prisma entende
     const aModel = UserEntityToUserPrismaModelMapper.map(user);
@@ -72,6 +88,7 @@ export class UserPrismaRepository extends UserGateway {
         name: aModel.name,
         email: aModel.email,
         password: aModel.password,
+        whatsappNumber: aModel.whatsappNumber,
         updatedAt: aModel.updatedAt,
       },
     });

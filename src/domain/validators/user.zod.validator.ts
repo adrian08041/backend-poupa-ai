@@ -40,6 +40,12 @@ export class UserZodValidator implements Validator<User> {
       name: z.string().nullable(),
       email: z.string().email({ message: 'Email deve ser um endereço válido' }),
       password: z.string().min(1, 'Senha não pode estar vazia'),
+      whatsappNumber: z
+        .string()
+        .regex(/^\+[1-9]\d{1,14}$/, {
+          message: 'Número de WhatsApp deve estar no formato E.164 (ex: +5511999999999)',
+        })
+        .nullable(),
       role: z.enum(['USER', 'ADMIN'], {
         message: 'Role deve ser USER ou ADMIN',
       }),

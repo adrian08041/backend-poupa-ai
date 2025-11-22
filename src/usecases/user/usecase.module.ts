@@ -5,6 +5,9 @@ import { LoginUserUsecase } from './login/login-user.usecase';
 import { UpdateProfileUseCase } from './update-profile/update-profile.usecase';
 import { ChangePasswordUseCase } from './change-password/change-password.usecase';
 import { DeleteAccountUseCase } from './delete-account/delete-account.usecase';
+import { LinkWhatsappToUserUseCase } from './link-whatsapp/link-whatsapp-to-user.usecase';
+import { AuthenticateWithWhatsappUseCase } from './authenticate-whatsapp/authenticate-with-whatsapp.usecase';
+import { UnlinkWhatsappFromUserUseCase } from './unlink-whatsapp/unlink-whatsapp-from-user.usecase';
 import { Module } from '@nestjs/common';
 import { DatabaseModule } from 'src/infra/repositories/database.module';
 import { ServiceModule } from 'src/infra/services/service.module';
@@ -20,6 +23,9 @@ import { GetEnumsMetadataUsecase } from '../metadata/get-enums/get-enums-metadat
     UpdateProfileUseCase,
     ChangePasswordUseCase,
     DeleteAccountUseCase,
+    LinkWhatsappToUserUseCase,
+    AuthenticateWithWhatsappUseCase,
+    UnlinkWhatsappFromUserUseCase,
     GetEnumsMetadataUsecase,
   ],
   exports: [
@@ -30,6 +36,9 @@ import { GetEnumsMetadataUsecase } from '../metadata/get-enums/get-enums-metadat
     UpdateProfileUseCase,
     ChangePasswordUseCase,
     DeleteAccountUseCase,
+    LinkWhatsappToUserUseCase,
+    AuthenticateWithWhatsappUseCase,
+    UnlinkWhatsappFromUserUseCase,
     GetEnumsMetadataUsecase,
   ],
 })

@@ -10,6 +10,7 @@ export type UserCreateDto = {
   name?: string;
   email: string;
   password: string;
+  whatsappNumber?: string;
   role?: UserRole;
 };
 
@@ -18,6 +19,7 @@ export type UserWithDto = {
   name: string | null;
   email: string;
   password: string;
+  whatsappNumber: string | null;
   role: UserRole;
   createdAt: Date;
   updatedAt: Date;
@@ -29,6 +31,7 @@ export class User extends Entity {
     private name: string | null,
     private email: string,
     private password: string,
+    private whatsappNumber: string | null,
     private role: UserRole,
     createdAt: Date,
     updatedAt: Date,
@@ -41,6 +44,7 @@ export class User extends Entity {
     name = undefined,
     email,
     password,
+    whatsappNumber = undefined,
     role = UserRole.USER,
   }: UserCreateDto): User {
     const id = Utils.generateUUID();
@@ -56,6 +60,7 @@ export class User extends Entity {
       name ?? null,
       email,
       hashedPassword,
+      whatsappNumber ?? null,
       role,
       createdAt,
       updatedAt,
@@ -67,11 +72,12 @@ export class User extends Entity {
     name,
     email,
     password,
+    whatsappNumber,
     role,
     createdAt,
     updatedAt,
   }: UserWithDto): User {
-    return new User(id, name, email, password, role, createdAt, updatedAt);
+    return new User(id, name, email, password, whatsappNumber, role, createdAt, updatedAt);
   }
 
   protected validate(): void {
@@ -114,5 +120,15 @@ export class User extends Entity {
     UserPasswordValidatorFactory.create().validate(newPassword);
     this.password = Utils.encryptPassword(newPassword);
     this.updatedAt = new Date();
+  }
+
+  public getWhatsappNumber(): string | null {
+    return this.whatsappNumber;
+  }
+
+  public updateWhatsappNumber(whatsappNumber: string | null): void {
+    this.whatsappNumber = whatsappNumber;
+    this.updatedAt = new Date();
+    this.validate();
   }
 }

@@ -9,6 +9,8 @@ import { UsecaseExceptionFilterProvider } from './filters/usecase-exception.filt
 import { CredentialsNotValidUsecaseExceptionFilterProvider } from './filters/credentials-not-valid-usecase-exception.filter';
 import { EmailAlreadyExistsUsecaseExceptionFilterProvider } from './filters/email-already-exists-usecase-exception.filter';
 import { UserNotFoundUsecaseExceptionFilterProvider } from './filters/user-not-found-usecase-exception.filter';
+import { WhatsappAlreadyInUseUsecaseExceptionFilterProvider } from './filters/whatsapp-already-in-use-usecase-exception.filter';
+import { WhatsappNotLinkedUsecaseExceptionFilterProvider } from './filters/whatsapp-not-linked-usecase-exception.filter';
 import { ServiceExceptionFilterProvider } from './filters/service-exception.filter';
 import { RefreshTokenNotValidServiceExceptionFilterProvider } from './filters/refresh-token-not-valid-service-exception.filter';
 import { TransactionNotFoundUsecaseExceptionFilterProvider } from './filters/transaction-not-found-usecase-exception.filter';
@@ -20,6 +22,9 @@ import { FindByIdUserRoute } from './routes/user/find-by-id/find-by-id-user.rout
 import { UpdateProfileRoute } from './routes/user/update-profile/update-profile.route';
 import { ChangePasswordRoute } from './routes/user/change-password/change-password.route';
 import { DeleteAccountRoute } from './routes/user/delete-account/delete-account.route';
+import { LinkWhatsappRoute } from './routes/user/link-whatsapp/link-whatsapp.route';
+import { AuthenticateWhatsappRoute } from './routes/user/authenticate-whatsapp/authenticate-whatsapp.route';
+import { UnlinkWhatsappRoute } from './routes/user/unlink-whatsapp/unlink-whatsapp.route';
 import { AuthGuardProvider } from './auth/auth.guard';
 import { ServiceModule } from '../services/service.module';
 import { LogoutUserRoute } from './routes/user/logout/logout-user.route';
@@ -47,6 +52,9 @@ import { RecurringTransactionModule } from './routes/recurring-transaction/recur
     UpdateProfileRoute,
     ChangePasswordRoute,
     DeleteAccountRoute,
+    LinkWhatsappRoute,
+    AuthenticateWhatsappRoute,
+    UnlinkWhatsappRoute,
     // Transaction routes
     CreateTransactionRoute,
     ListTransactionsRoute,
@@ -68,6 +76,8 @@ import { RecurringTransactionModule } from './routes/recurring-transaction/recur
     CredentialsNotValidUsecaseExceptionFilterProvider,
     EmailAlreadyExistsUsecaseExceptionFilterProvider,
     UserNotFoundUsecaseExceptionFilterProvider,
+    WhatsappAlreadyInUseUsecaseExceptionFilterProvider,
+    WhatsappNotLinkedUsecaseExceptionFilterProvider,
     // Transaction exception filters
     TransactionNotFoundUsecaseExceptionFilterProvider,
     UnauthorizedTransactionAccessUsecaseExceptionFilterProvider,
