@@ -31,8 +31,14 @@ export class AuthenticateWithWhatsappUseCase
   public async execute({
     whatsappNumber,
   }: AuthenticateWithWhatsappInput): Promise<AuthenticateWithWhatsappOutput> {
+    // Sanitizar o número recebido
+    let sanitizedNumber = whatsappNumber.replace(/[^\d+]/g, '');
+    if (!sanitizedNumber.startsWith('+')) {
+      sanitizedNumber = `+${sanitizedNumber}`;
+    }
+
     // 1. Buscar usuário pelo WhatsApp
-    const user = await this.userGateway.findByWhatsappNumber(whatsappNumber);
+    const user = await this.userGateway.findByWhatsappNumber(sanitizedNumber);
 
     if (!user) {
       throw new WhatsappNotLinkedUsecaseException(
