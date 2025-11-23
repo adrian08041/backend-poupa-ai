@@ -25,27 +25,22 @@ async function bootstrap() {
     origin: (origin, callback) => {
       // Permite requisições sem 'origin' (Postman, apps mobile, etc.)
       if (!origin) {
-        console.log('✅ CORS: Permitindo requisição sem origin');
         return callback(null, true);
       }
 
-      console.log(`🔍 CORS: Verificando origem: ${origin}`);
-
       // Permite qualquer subdomínio de vercel.app (deploy previews)
       if (origin.endsWith('.vercel.app')) {
-        console.log(`✅ CORS: Permitindo origem Vercel: ${origin}`);
         return callback(null, true);
       }
 
       // Verifica se a origem está na lista de permitidas
       if (allowedOrigins.includes(origin)) {
-        console.log(`✅ CORS: Origem permitida: ${origin}`);
         return callback(null, true);
       }
 
       // Origem não permitida
-      console.log(`❌ CORS: Origem bloqueada: ${origin}`);
-      console.log(`📋 Origens configuradas: ${allowedOrigins.join(', ')}`);
+      console.warn(`❌ CORS: Origem bloqueada: ${origin}`);
+      console.warn(`📋 Origens configuradas: ${allowedOrigins.join(', ')}`);
       return callback(new Error('Not allowed by CORS'));
     },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'],

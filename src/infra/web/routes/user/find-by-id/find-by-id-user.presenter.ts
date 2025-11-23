@@ -7,6 +7,7 @@ export class FindByIdUserPresenter {
       id: input.id,
       name: input.name,
       email: input.email,
+      whatsapp: input.whatsapp,
       createdAt: input.createdAt,
       updatedAt: input.updatedAt,
     };

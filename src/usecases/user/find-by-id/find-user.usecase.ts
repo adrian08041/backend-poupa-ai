@@ -11,6 +11,7 @@ export type FindUserOutput = {
   id: string;
   name: string | null;
   email: string;
+  whatsapp: string | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -34,6 +35,7 @@ export class FindUserUseCase implements UseCase<FindUserInput, FindUserOutput> {
       id: anUser.getId(),
       name: anUser.getName(),
       email: anUser.getEmail(),
+      whatsapp: anUser.getWhatsappNumber(),
       createdAt: anUser.getCreatedAt(),
       updatedAt: anUser.getUpdatedAt(),
     };
