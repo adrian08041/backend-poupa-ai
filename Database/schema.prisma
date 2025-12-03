@@ -1,0 +1,158 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                    String                 @id @default(uuid())
+  name                  String?
+  email                 String                 @unique
+  password              String
+  whatsappNumber        String?                @unique
+  role                  String                 @default("USER")
+  subscriptions         UserSubscription[]
+  transactions          Transaction[]
+  recurringTransactions RecurringTransaction[]
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+
+  @@map("user")
+}
+
+model Plan {
+  id                String             @id @default(uuid())
+  name              String
+  price             Decimal            @db.Decimal(10, 2)
+  active            Boolean            @default(true)
+  transaction_limit Int
+  limited_reports   Boolean            @default(false)
+  subscriptions     UserSubscription[]
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  @@map("plan")
+}
+
+model UserSubscription {
+  id         String             @id @default(uuid())
+  user_id    String
+  plan_id    String
+  status     SubscriptionStatus @default(INACTIVE)
+  expires_at DateTime?
+  user       User               @relation(fields: [user_id], references: [id])
+  plan       Plan               @relation(fields: [plan_id], references: [id])
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+
+  @@map("user_subscription")
+}
+
+model Transaction {
+  id                     String              @id @default(uuid())
+  userId                 String
+  type                   TransactionType
+  category               TransactionCategory
+  paymentMethod          PaymentMethod?
+  amount                 Int
+  description            String?
+  date                   DateTime
+  deletedAt              DateTime?
+  recurringTransactionId String?
+  createdAt              DateTime            @default(now())
+  updatedAt              DateTime            @updatedAt
+
+  user                 User                  @relation(fields: [userId], references: [id])
+  recurringTransaction RecurringTransaction? @relation(fields: [recurringTransactionId], references: [id])
+
+  @@index([userId])
+  @@index([date])
+  @@index([type])
+  @@index([deletedAt])
+  @@index([recurringTransactionId])
+  @@map("transaction")
+}
+
+model RecurringTransaction {
+  id            String              @id @default(uuid())
+  userId        String
+  type          TransactionType
+  category      TransactionCategory
+  paymentMethod PaymentMethod?
+  amount        Int
+  description   String?
+  frequency     RecurrenceFrequency
+  startDate     DateTime
+  endDate       DateTime?
+  dayOfMonth    Int? // Para mensais: dia do mês (1-31)
+  dayOfWeek     Int? // Para semanais: dia da semana (0-6, sendo 0 domingo)
+  active        Boolean             @default(true)
+  lastProcessed DateTime?
+  deletedAt     DateTime?
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id])
+  transactions Transaction[]
+
+  @@index([userId])
+  @@index([active])
+  @@index([frequency])
+  @@index([deletedAt])
+  @@map("recurring_transaction")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum TransactionType {
+  INCOME // Receita/Depósito
+  EXPENSE // Despesa/Gasto
+  INVESTMENT // Investimento
+}
+
+enum TransactionCategory {
+  // Categorias de DESPESA
+  ALIMENTACAO
+  TRANSPORTE
+  LAZER
+  SAUDE
+  EDUCACAO
+  MORADIA
+  VESTUARIO
+
+  // Categorias de RECEITA
+  SALARIO
+  FREELANCE
+  INVESTIMENTO
+  PRESENTE
+
+  // Genérico
+  OUTROS
+}
+
+enum PaymentMethod {
+  PIX
+  BOLETO
+  CARTAO
+  TRANSFERENCIA
+  DINHEIRO
+}
+
+enum RecurrenceFrequency {
+  DAILY // Diário
+  WEEKLY // Semanal
+  MONTHLY // Mensal
+  YEARLY // Anual
+}
