@@ -28,7 +28,6 @@ import { UnlinkWhatsappRoute } from './routes/user/unlink-whatsapp/unlink-whatsa
 import { AuthGuardProvider } from './auth/auth.guard';
 import { ServiceModule } from '../services/service.module';
 import { LogoutUserRoute } from './routes/user/logout/logout-user.route';
-import { LogoutUserUsecase } from 'src/usecases/user/logout/logout-user.usecase';
 import { CreateTransactionRoute } from './routes/transaction/create/create-transaction.route';
 import { ListTransactionsRoute } from './routes/transaction/list/list-transactions.route';
 import { DeleteTransactionRoute } from './routes/transaction/delete/delete-transaction.route';
@@ -85,7 +84,6 @@ import { RecurringTransactionModule } from './routes/recurring-transaction/recur
     // Service exception filters
     ServiceExceptionFilterProvider,
     RefreshTokenNotValidServiceExceptionFilterProvider,
-    LogoutUserUsecase,
   ],
 })
 export class WebModule {}

@@ -3,7 +3,33 @@ import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
 
+function validateEnv() {
+  const required = [
+    'DATABASE_URL',
+    'JWT_AUTH_SECRET',
+    'JWT_REFRESH_SECRET',
+  ];
+
+  const missing = required.filter((key) => !process.env[key]);
+
+  if (missing.length > 0) {
+    throw new Error(
+      `Variáveis de ambiente obrigatórias não definidas: ${missing.join(', ')}`,
+    );
+  }
+
+  if (process.env.JWT_AUTH_SECRET && process.env.JWT_AUTH_SECRET.length < 32) {
+    throw new Error('JWT_AUTH_SECRET deve ter pelo menos 32 caracteres');
+  }
+
+  if (process.env.JWT_REFRESH_SECRET && process.env.JWT_REFRESH_SECRET.length < 32) {
+    throw new Error('JWT_REFRESH_SECRET deve ter pelo menos 32 caracteres');
+  }
+}
+
 async function bootstrap() {
+  validateEnv();
+
   const app = await NestFactory.create(AppModule);
 
   app.use(cookieParser());
@@ -24,7 +50,6 @@ async function bootstrap() {
     allowedOrigins.push(process.env.FRONTEND_URL);
   }
 
-  console.log('🔐 CORS: Origens permitidas:', allowedOrigins);
 
   app.enableCors({
     origin: (origin, callback) => {
@@ -43,8 +68,6 @@ async function bootstrap() {
       }
 
       // Origem não permitida
-      console.warn(`❌ CORS: Origem bloqueada: ${origin}`);
-      console.warn(`📋 Origens configuradas: ${allowedOrigins.join(', ')}`);
       return callback(new Error('Not allowed by CORS'));
     },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'],

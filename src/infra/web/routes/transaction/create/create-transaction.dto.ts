@@ -1,24 +1,19 @@
-// <� Request: O que o CLIENTE envia para criar uma transa��o
-export type CreateTransactionRouteRequest = {
-  type: 'INCOME' | 'EXPENSE' | 'INVESTMENT'; // Tipo: receita, despesa ou investimento
-  category:
-    | 'ALIMENTACAO'
-    | 'TRANSPORTE'
-    | 'LAZER'
-    | 'SAUDE'
-    | 'EDUCACAO'
-    | 'MORADIA'
-    | 'VESTUARIO'
-    | 'SALARIO'
-    | 'FREELANCE'
-    | 'INVESTIMENTO'
-    | 'PRESENTE'
-    | 'OUTROS';
-  paymentMethod?: 'PIX' | 'BOLETO' | 'CARTAO' | 'TRANSFERENCIA' | 'DINHEIRO';
-  amount: number;
-  description?: string;
-  date: string;
-};
+import { z } from 'zod';
+
+export const createTransactionSchema = z.object({
+  type: z.enum(['INCOME', 'EXPENSE', 'INVESTMENT']),
+  category: z.enum([
+    'ALIMENTACAO', 'TRANSPORTE', 'LAZER', 'SAUDE', 'EDUCACAO',
+    'MORADIA', 'VESTUARIO', 'SALARIO', 'FREELANCE', 'INVESTIMENTO',
+    'PRESENTE', 'OUTROS',
+  ]),
+  paymentMethod: z.enum(['PIX', 'BOLETO', 'CARTAO', 'TRANSFERENCIA', 'DINHEIRO']).optional(),
+  amount: z.number().positive('Valor deve ser positivo'),
+  description: z.string().optional(),
+  date: z.string().min(1, 'Data é obrigatória'),
+}).strict();
+
+export type CreateTransactionRouteRequest = z.infer<typeof createTransactionSchema>;
 
 export type CreateTransactionRouteResponse = {
   id: string; // ID da transa��o criada

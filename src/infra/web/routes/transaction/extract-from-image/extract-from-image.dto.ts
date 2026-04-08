@@ -8,5 +8,4 @@ export interface ExtractFromImageRouteResponse {
   category?: string;
   date?: string;
   confidence: number;
-  extractedText?: string; // Opcional, para debug
 }

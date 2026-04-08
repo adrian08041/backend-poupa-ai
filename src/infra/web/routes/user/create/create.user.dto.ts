@@ -1,8 +1,12 @@
-export type CreateUserRouteRequest = {
-  name: string;
-  email: string;
-  password: string;
-};
+import { z } from 'zod';
+
+export const createUserSchema = z.object({
+  name: z.string().min(1, 'Nome é obrigatório'),
+  email: z.string().email('E-mail inválido'),
+  password: z.string().min(8, 'Senha deve ter pelo menos 8 caracteres'),
+}).strict();
+
+export type CreateUserRouteRequest = z.infer<typeof createUserSchema>;
 
 export type CreateUserRouteResponse = {
   id: string;

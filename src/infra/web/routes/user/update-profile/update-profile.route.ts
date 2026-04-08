@@ -8,7 +8,9 @@ import type {
   UpdateProfileRouteRequest,
   UpdateProfileRouteResponse,
 } from './update-profile.dto';
+import { updateProfileSchema } from './update-profile.dto';
 import { UpdateProfilePresenter } from './update-profile.presenter';
+import { ZodValidationPipe } from 'src/infra/web/pipes/zod-validation.pipe';
 
 @Controller('users')
 export class UpdateProfileRoute {
@@ -19,7 +21,7 @@ export class UpdateProfileRoute {
   @Put('profile')
   public async handle(
     @UserId() userId: string,
-    @Body() request: UpdateProfileRouteRequest,
+    @Body(new ZodValidationPipe(updateProfileSchema)) request: UpdateProfileRouteRequest,
   ): Promise<UpdateProfileRouteResponse> {
     const input: UpdateProfileInput = {
       userId,

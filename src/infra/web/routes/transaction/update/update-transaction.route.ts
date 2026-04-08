@@ -3,6 +3,7 @@ import type {
   UpdateTransactionRouteRequest,
   UpdateTransactionRouteResponse,
 } from './update-transaction.dto';
+import { updateTransactionSchema } from './update-transaction.dto';
 import { UpdateTransactionPresenter } from './update-transaction.presenter';
 import { UserId } from 'src/infra/web/auth/decorators/user-id.decorator';
 import {
@@ -14,6 +15,7 @@ import {
   TransactionCategory,
   PaymentMethod,
 } from 'src/domain/entities/transaction/transaction.entity';
+import { ZodValidationPipe } from 'src/infra/web/pipes/zod-validation.pipe';
 
 @Controller('transactions')
 export class UpdateTransactionRoute {
@@ -24,7 +26,7 @@ export class UpdateTransactionRoute {
   @Put(':id')
   public async handle(
     @Param('id') transactionId: string,
-    @Body() request: UpdateTransactionRouteRequest,
+    @Body(new ZodValidationPipe(updateTransactionSchema)) request: UpdateTransactionRouteRequest,
     @UserId() userId: string,
   ): Promise<UpdateTransactionRouteResponse> {
     const input: UpdateTransactionInput = {

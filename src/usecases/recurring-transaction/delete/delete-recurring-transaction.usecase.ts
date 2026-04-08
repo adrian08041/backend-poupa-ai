@@ -26,10 +26,6 @@ export class DeleteRecurringTransactionUsecase
   async execute(
     input: DeleteRecurringTransactionInput,
   ): Promise<DeleteRecurringTransactionOutput> {
-    console.log(
-      `🔍 Iniciando deleção da recurring transaction: ${input.id}`,
-    );
-
     const recurringTransaction =
       await this.recurringTransactionRepository.findById(input.id);
 
@@ -41,18 +37,8 @@ export class DeleteRecurringTransactionUsecase
       throw new NotFoundException('Transação recorrente não encontrada');
     }
 
-    console.log(`✅ Recurring transaction encontrada, iniciando deleção...`);
-
-    // Deleta a transação recorrente
     await this.recurringTransactionRepository.delete(input.id);
-    console.log(`✅ Recurring transaction deletada`);
-
-    // Deleta todas as transações geradas por esta transação recorrente
-    console.log(
-      `🔄 Deletando transações vinculadas à recurring ${input.id}...`,
-    );
     await this.transactionGateway.softDeleteByRecurringTransactionId(input.id);
-    console.log(`✅ Transações vinculadas deletadas`);
 
     return { success: true };
   }

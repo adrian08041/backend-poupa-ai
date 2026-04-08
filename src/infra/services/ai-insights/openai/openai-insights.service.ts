@@ -26,8 +26,6 @@ export class OpenAIInsightsService extends AiInsightsService {
 
   async generateInsights(reportData: ReportData): Promise<AIInsights> {
     try {
-      console.log('🤖 Gerando insights com OpenAI...');
-
       const prompt = this.buildPrompt(reportData);
 
       const response = await this.openai.chat.completions.create({
@@ -53,19 +51,13 @@ export class OpenAIInsightsService extends AiInsightsService {
         throw new Error('Resposta vazia da OpenAI');
       }
 
-      // Remove markdown se houver
       const cleanedContent = content
         .replace(/```json\n?/g, '')
         .replace(/```\n?/g, '')
         .trim();
 
-      const insights: AIInsights = JSON.parse(cleanedContent);
-
-      console.log('✅ Insights gerados com sucesso');
-      return insights;
-    } catch (error) {
-      console.error('❌ Erro ao gerar insights:', error);
-      // Retorna insights padrão em caso de erro
+      return JSON.parse(cleanedContent) as AIInsights;
+    } catch {
       return this.getFallbackInsights(reportData);
     }
   }

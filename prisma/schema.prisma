@@ -62,7 +62,7 @@ model UserSubscription {
   plan_id    String
   status     SubscriptionStatus @default(INACTIVE)
   expires_at DateTime?
-  user       User               @relation(fields: [user_id], references: [id])
+  user       User               @relation(fields: [user_id], references: [id], onDelete: Cascade)
   plan       Plan               @relation(fields: [plan_id], references: [id])
   createdAt  DateTime           @default(now())
   updatedAt  DateTime           @updatedAt
@@ -84,8 +84,8 @@ model Transaction {
   createdAt              DateTime            @default(now())
   updatedAt              DateTime            @updatedAt
 
-  user                 User                  @relation(fields: [userId], references: [id])
-  recurringTransaction RecurringTransaction? @relation(fields: [recurringTransactionId], references: [id])
+  user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recurringTransaction RecurringTransaction? @relation(fields: [recurringTransactionId], references: [id], onDelete: SetNull)
 
   @@index([userId, deletedAt, date(sort: Desc)])
   @@index([userId, deletedAt, type])
@@ -114,7 +114,7 @@ model RecurringTransaction {
   createdAt     DateTime            @default(now())
   updatedAt     DateTime            @updatedAt
 
-  user         User          @relation(fields: [userId], references: [id])
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   transactions Transaction[]
 
   @@index([userId])

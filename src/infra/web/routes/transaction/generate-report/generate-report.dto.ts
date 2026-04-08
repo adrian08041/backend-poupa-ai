@@ -16,7 +16,7 @@ export const generateReportQuerySchema = z.object({
     .string()
     .optional()
     .transform((val) => val === 'true'),
-});
+}).strict();
 
 export type GenerateReportQueryDto = z.infer<
   typeof generateReportQuerySchema

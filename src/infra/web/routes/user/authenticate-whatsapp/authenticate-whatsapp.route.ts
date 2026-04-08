@@ -9,6 +9,8 @@ import type {
   AuthenticateWhatsappRequest,
   AuthenticateWhatsappResponse,
 } from './authenticate-whatsapp.dto';
+import { authenticateWhatsappSchema } from './authenticate-whatsapp.dto';
+import { ZodValidationPipe } from 'src/infra/web/pipes/zod-validation.pipe';
 
 @Controller('/users')
 export class AuthenticateWhatsappRoute {
@@ -19,7 +21,7 @@ export class AuthenticateWhatsappRoute {
   @IsPublic()
   @Post('/whatsapp/auth')
   public async handle(
-    @Body() request: AuthenticateWhatsappRequest,
+    @Body(new ZodValidationPipe(authenticateWhatsappSchema)) request: AuthenticateWhatsappRequest,
   ): Promise<AuthenticateWhatsappResponse> {
     const input: AuthenticateWithWhatsappInput = {
       whatsappNumber: request.whatsappNumber,

@@ -28,64 +28,47 @@ export class OpenAiParserService extends AiParserService {
   async parseTransactionFromText(
     text: string,
   ): Promise<ExtractedTransactionData> {
-    try {
-      console.log('🤖 Iniciando parsing com OpenAI GPT...');
+    const prompt = this.buildPrompt(text);
 
-      const prompt = this.buildPrompt(text);
+    const response = await this.openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        {
+          role: 'system',
+          content:
+            'Você é um assistente especializado em extrair informações de extratos bancários e comprovantes de transações financeiras. Sempre retorne APENAS um JSON válido, sem texto adicional.',
+        },
+        {
+          role: 'user',
+          content: prompt,
+        },
+      ],
+      temperature: 0.3,
+      max_tokens: 500,
+    });
 
-      // Faz a chamada para a API da OpenAI
-      const response = await this.openai.chat.completions.create({
-        model: 'gpt-3.5-turbo', // Modelo mais barato, mas você pode usar gpt-4 para mais precisão
-        messages: [
-          {
-            role: 'system',
-            content:
-              'Você é um assistente especializado em extrair informações de extratos bancários e comprovantes de transações financeiras. Sempre retorne APENAS um JSON válido, sem texto adicional.',
-          },
-          {
-            role: 'user',
-            content: prompt,
-          },
-        ],
-        temperature: 0.3, // Baixa temperatura para respostas mais consistentes
-        max_tokens: 500,
-      });
+    const content = response.choices[0]?.message?.content;
 
-      const content = response.choices[0]?.message?.content;
-
-      if (!content) {
-        throw new Error('Resposta vazia da OpenAI');
-      }
-
-      console.log('📝 Resposta da OpenAI:', content);
-
-      // Parse do JSON retornado
-      const parsed = JSON.parse(content);
-
-      // Validação básica da resposta
-      if (!parsed.description || !parsed.amount || !parsed.type) {
-        throw new Error('Resposta da IA não contém todos os campos obrigatórios');
-      }
-
-      // Normaliza o tipo para garantir que é válido
-      const normalizedType = this.normalizeType(parsed.type);
-
-      const result: ExtractedTransactionData = {
-        description: parsed.description,
-        amount: parseFloat(parsed.amount),
-        type: normalizedType,
-        category: parsed.category || undefined,
-        date: parsed.date || undefined,
-        confidence: parsed.confidence || 50,
-      };
-
-      console.log('✅ Dados extraídos com sucesso:', result);
-
-      return result;
-    } catch (error) {
-      console.error('❌ Erro ao fazer parsing com OpenAI:', error);
-      throw new Error(`Falha ao processar texto com OpenAI: ${error.message}`);
+    if (!content) {
+      throw new Error('Resposta vazia da OpenAI');
     }
+
+    const parsed = JSON.parse(content);
+
+    if (!parsed.description || !parsed.amount || !parsed.type) {
+      throw new Error('Resposta da IA não contém todos os campos obrigatórios');
+    }
+
+    const normalizedType = this.normalizeType(parsed.type);
+
+    return {
+      description: parsed.description,
+      amount: parseFloat(parsed.amount),
+      type: normalizedType,
+      category: parsed.category || undefined,
+      date: parsed.date || undefined,
+      confidence: parsed.confidence || 50,
+    };
   }
 
   /**

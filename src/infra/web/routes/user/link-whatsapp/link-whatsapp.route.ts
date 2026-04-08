@@ -6,6 +6,8 @@ import {
 import { UserId } from 'src/infra/web/auth/decorators/user-id.decorator';
 import { LinkWhatsappPresenter } from './link-whatsapp.presenter';
 import type { LinkWhatsappRequest, LinkWhatsappResponse } from './link-whatsapp.dto';
+import { linkWhatsappSchema } from './link-whatsapp.dto';
+import { ZodValidationPipe } from 'src/infra/web/pipes/zod-validation.pipe';
 
 @Controller('/users')
 export class LinkWhatsappRoute {
@@ -16,7 +18,7 @@ export class LinkWhatsappRoute {
   @Put('/me/whatsapp')
   public async handle(
     @UserId() userId: string,
-    @Body() request: LinkWhatsappRequest,
+    @Body(new ZodValidationPipe(linkWhatsappSchema)) request: LinkWhatsappRequest,
   ): Promise<LinkWhatsappResponse> {
     const input: LinkWhatsappToUserInput = {
       userId: userId,

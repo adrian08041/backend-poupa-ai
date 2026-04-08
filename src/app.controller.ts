@@ -8,8 +8,27 @@ export class AppController {
 
   @IsPublic()
   @Get('health')
-  async healthCheck() {
-    await this.prisma.$queryRaw`SELECT 1`;
-    return { status: 'ok', database: 'connected' };
+  healthCheck() {
+    return { status: 'ok' };
+  }
+
+  @IsPublic()
+  @Get('health/ready')
+  async readinessCheck() {
+    const checks: Record<string, string> = {};
+
+    try {
+      await this.prisma.$queryRaw`SELECT 1`;
+      checks.database = 'connected';
+    } catch {
+      checks.database = 'disconnected';
+    }
+
+    const allHealthy = Object.values(checks).every((v) => v !== 'disconnected');
+
+    return {
+      status: allHealthy ? 'ok' : 'degraded',
+      checks,
+    };
   }
 }

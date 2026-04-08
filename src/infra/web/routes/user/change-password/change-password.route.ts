@@ -8,7 +8,9 @@ import type {
   ChangePasswordRouteRequest,
   ChangePasswordRouteResponse,
 } from './change-password.dto';
+import { changePasswordSchema } from './change-password.dto';
 import { ChangePasswordPresenter } from './change-password.presenter';
+import { ZodValidationPipe } from 'src/infra/web/pipes/zod-validation.pipe';
 
 @Controller('users')
 export class ChangePasswordRoute {
@@ -19,7 +21,7 @@ export class ChangePasswordRoute {
   @Put('change-password')
   public async handle(
     @UserId() userId: string,
-    @Body() request: ChangePasswordRouteRequest,
+    @Body(new ZodValidationPipe(changePasswordSchema)) request: ChangePasswordRouteRequest,
   ): Promise<ChangePasswordRouteResponse> {
     const input: ChangePasswordInput = {
       userId,

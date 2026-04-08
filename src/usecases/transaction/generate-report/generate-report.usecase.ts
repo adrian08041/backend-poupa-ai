@@ -101,11 +101,6 @@ export class GenerateReportUsecase
   ) {}
 
   async execute(input: GenerateReportInput): Promise<GenerateReportOutput> {
-    console.log(
-      `📊 Gerando relatório para ${input.month}/${input.year} - Usuário: ${input.userId}`,
-    );
-
-    // 1. Buscar transações do período atual
     const startDate = new Date(input.year, input.month - 1, 1);
     const endDate = new Date(input.year, input.month, 0, 23, 59, 59, 999);
 
@@ -114,8 +109,6 @@ export class GenerateReportUsecase
       startDate,
       endDate,
     );
-
-    console.log(`📋 Encontradas ${transactions.length} transações no período`);
 
     // 2. Calcular dados do período atual
     const currentPeriodData = this.calculatePeriodData(
@@ -235,8 +228,6 @@ export class GenerateReportUsecase
 
     // 5. Gerar insights com IA
     const insights = await this.aiInsightsService.generateInsights(reportData);
-
-    console.log('✅ Relatório gerado com sucesso');
 
     // 6. Retornar relatório completo
     return {

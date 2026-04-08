@@ -20,7 +20,6 @@ export interface ExtractTransactionFromImageOutput {
   category?: string;
   date?: string;
   confidence: number;
-  extractedText: string; // Texto bruto extraído do OCR (para debug)
 }
 
 /**
@@ -45,50 +44,26 @@ export class ExtractTransactionFromImageUseCase
   async execute(
     input: ExtractTransactionFromImageInput,
   ): Promise<ExtractTransactionFromImageOutput> {
-    console.log('🚀 Iniciando extração de transação de imagem...');
+    const extractedText = await this.ocrService.extractTextFromImage(
+      input.imageBuffer,
+    );
 
-    try {
-      // Passo 1: Extrair texto da imagem usando OCR
-      console.log('📸 Passo 1: Extraindo texto da imagem...');
-      const extractedText = await this.ocrService.extractTextFromImage(
-        input.imageBuffer,
+    if (!extractedText || extractedText.trim().length === 0) {
+      throw new Error(
+        'Não foi possível extrair texto da imagem. Verifique se a imagem contém texto legível.',
       );
-
-      if (!extractedText || extractedText.trim().length === 0) {
-        throw new Error(
-          'Não foi possível extrair texto da imagem. Verifique se a imagem contém texto legível.',
-        );
-      }
-
-      console.log(
-        '✅ Texto extraído:',
-        extractedText.substring(0, 200) + '...',
-      );
-
-      // Passo 2: Estruturar dados usando IA
-      console.log('🤖 Passo 2: Estruturando dados com IA...');
-      const parsedData =
-        await this.aiParserService.parseTransactionFromText(extractedText);
-
-      console.log('✅ Dados estruturados:', parsedData);
-
-      // Passo 3: Retornar resultado
-      const output: ExtractTransactionFromImageOutput = {
-        description: parsedData.description,
-        amount: parsedData.amount,
-        type: parsedData.type,
-        category: parsedData.category,
-        date: parsedData.date,
-        confidence: parsedData.confidence,
-        extractedText: extractedText, // Incluído para debug/auditoria
-      };
-
-      console.log('🎉 Extração concluída com sucesso!');
-
-      return output;
-    } catch (error) {
-      console.error('❌ Erro ao extrair transação de imagem:', error);
-      throw error;
     }
+
+    const parsedData =
+      await this.aiParserService.parseTransactionFromText(extractedText);
+
+    return {
+      description: parsedData.description,
+      amount: parsedData.amount,
+      type: parsedData.type,
+      category: parsedData.category,
+      date: parsedData.date,
+      confidence: parsedData.confidence,
+    };
   }
 }

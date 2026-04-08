@@ -7,7 +7,9 @@ import {
 } from 'src/usecases/user/login/login-user.usecase';
 
 import type { LoginUserRequest } from './login-user.dto';
+import { loginUserSchema } from './login-user.dto';
 import { IsPublic } from 'src/infra/web/auth/decorators/is-public.decorator';
+import { ZodValidationPipe } from 'src/infra/web/pipes/zod-validation.pipe';
 
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
@@ -18,7 +20,7 @@ export class LoginUserRoute {
   @Throttle({ short: { ttl: 60000, limit: 5 } })
   @Post('/login')
   public async handle(
-    @Body() request: LoginUserRequest,
+    @Body(new ZodValidationPipe(loginUserSchema)) request: LoginUserRequest,
     @Res() res: Response,
   ): Promise<void> {
     const input: LoginUserInput = {

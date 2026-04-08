@@ -3,12 +3,14 @@ import type {
   CreateTransactionRouteRequest,
   CreateTransactionRouteResponse,
 } from './create-transaction.dto';
+import { createTransactionSchema } from './create-transaction.dto';
 import { CreateTransactionPresenter } from './create-transaction.presenter';
 import { UserId } from 'src/infra/web/auth/decorators/user-id.decorator';
 import {
   CreateTransactionInput,
   CreateTransactionUseCase,
 } from 'src/usecases/transaction/create/create-transaction.usecase';
+import { ZodValidationPipe } from 'src/infra/web/pipes/zod-validation.pipe';
 
 @Controller('transactions')
 export class CreateTransactionRoute {
@@ -18,7 +20,7 @@ export class CreateTransactionRoute {
 
   @Post()
   public async handle(
-    @Body() request: CreateTransactionRouteRequest,
+    @Body(new ZodValidationPipe(createTransactionSchema)) request: CreateTransactionRouteRequest,
     @UserId() userId: string,
   ): Promise<CreateTransactionRouteResponse> {
     const input: CreateTransactionInput = {
