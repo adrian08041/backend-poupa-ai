@@ -28,8 +28,8 @@ async function bootstrap() {
         return callback(null, true);
       }
 
-      // Permite qualquer subdomínio de vercel.app (deploy previews)
-      if (origin.endsWith('.vercel.app')) {
+      // Permite deploy previews do projeto na Vercel
+      if (/^https:\/\/frontend-poupa-ai[\w-]*\.vercel\.app$/.test(origin)) {
         return callback(null, true);
       }
 

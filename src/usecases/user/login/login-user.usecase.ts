@@ -41,7 +41,7 @@ export class LoginUserUsecase
 
     if (!isValidPassword) {
       throw new CredentialsNotValidUsecaseException(
-        `Password ${password} is not valid for user with email ${email} and id ${anUser.getId()} in ${LoginUserUsecase.name}`,
+        `Invalid password for user with email ${email} and id ${anUser.getId()} in ${LoginUserUsecase.name}`,
         `Credenciais inválidas`,
         LoginUserUsecase.name,
       );

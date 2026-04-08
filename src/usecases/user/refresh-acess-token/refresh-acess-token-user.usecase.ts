@@ -33,7 +33,7 @@ export class RefreshAuthTokenUserUsecase
 
     if (!anUser) {
       throw new CredentialsNotValidUsecaseException(
-        `User with id ${userId} not found while refreshing auth token with refresh token ${refreshToken} in ${RefreshAuthTokenUserUsecase.name}`,
+        `User with id ${userId} not found while refreshing auth token in ${RefreshAuthTokenUserUsecase.name}`,
         `Credenciais inválidas`,
         RefreshAuthTokenUserUsecase.name,
       );

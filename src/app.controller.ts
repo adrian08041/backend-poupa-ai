@@ -7,12 +7,6 @@ export class AppController {
   constructor(private prisma: PrismaService) {}
 
   @IsPublic()
-  @Get('users')
-  async getUsers() {
-    return this.prisma.user.findMany();
-  }
-
-  @IsPublic()
   @Get('health')
   async healthCheck() {
     await this.prisma.$queryRaw`SELECT 1`;
