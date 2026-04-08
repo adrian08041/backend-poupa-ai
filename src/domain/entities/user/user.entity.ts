@@ -21,6 +21,7 @@ export type UserWithDto = {
   password: string;
   whatsappNumber: string | null;
   role: UserRole;
+  tokenVersion: number;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -33,6 +34,7 @@ export class User extends Entity {
     private password: string,
     private whatsappNumber: string | null,
     private role: UserRole,
+    private tokenVersion: number,
     createdAt: Date,
     updatedAt: Date,
   ) {
@@ -40,18 +42,18 @@ export class User extends Entity {
     this.validate();
   }
 
-  public static create({
+  public static async create({
     name = undefined,
     email,
     password,
     whatsappNumber = undefined,
     role = UserRole.USER,
-  }: UserCreateDto): User {
+  }: UserCreateDto): Promise<User> {
     const id = Utils.generateUUID();
 
     UserPasswordValidatorFactory.create().validate(password);
 
-    const hashedPassword = Utils.encryptPassword(password);
+    const hashedPassword = await Utils.encryptPassword(password);
     const createdAt = new Date();
     const updatedAt = new Date();
 
@@ -62,6 +64,7 @@ export class User extends Entity {
       hashedPassword,
       whatsappNumber ?? null,
       role,
+      0,
       createdAt,
       updatedAt,
     );
@@ -74,10 +77,11 @@ export class User extends Entity {
     password,
     whatsappNumber,
     role,
+    tokenVersion,
     createdAt,
     updatedAt,
   }: UserWithDto): User {
-    return new User(id, name, email, password, whatsappNumber, role, createdAt, updatedAt);
+    return new User(id, name, email, password, whatsappNumber, role, tokenVersion, createdAt, updatedAt);
   }
 
   protected validate(): void {
@@ -100,7 +104,7 @@ export class User extends Entity {
     return this.role;
   }
 
-  public comparePassword(aPassword: string): boolean {
+  public async comparePassword(aPassword: string): Promise<boolean> {
     return Utils.comparePassword(aPassword, this.password);
   }
 
@@ -116,9 +120,18 @@ export class User extends Entity {
     this.validate();
   }
 
-  public updatePassword(newPassword: string): void {
+  public async updatePassword(newPassword: string): Promise<void> {
     UserPasswordValidatorFactory.create().validate(newPassword);
-    this.password = Utils.encryptPassword(newPassword);
+    this.password = await Utils.encryptPassword(newPassword);
+    this.updatedAt = new Date();
+  }
+
+  public getTokenVersion(): number {
+    return this.tokenVersion;
+  }
+
+  public incrementTokenVersion(): void {
+    this.tokenVersion++;
     this.updatedAt = new Date();
   }
 

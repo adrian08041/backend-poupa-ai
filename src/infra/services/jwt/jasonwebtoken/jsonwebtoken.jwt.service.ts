@@ -30,22 +30,12 @@ export class JasonWebTokenService extends JwtService {
     this.refreshSecret = process.env.JWT_REFRESH_SECRET;
   }
 
-  public generateAuthToken(userId: string): string {
-    const payload = this.generateAuthTokenPayload(userId);
+  public generateAuthToken(userId: string, tokenVersion = 0): string {
+    const payload: JwtAuthPayload = { userId, tokenVersion };
 
-    const token = jsonwebtoken.sign(payload, this.authSecret, {
+    return jsonwebtoken.sign(payload, this.authSecret, {
       expiresIn: '1h',
     });
-
-    return token;
-  }
-
-  private generateAuthTokenPayload(userId: string): JwtAuthPayload {
-    const payload: JwtAuthPayload = {
-      userId,
-    };
-
-    return payload;
   }
 
   public generateRefreshToken(userId: string): string {
@@ -88,14 +78,14 @@ export class JasonWebTokenService extends JwtService {
     } catch (error) {
       if (error instanceof jsonwebtoken.TokenExpiredError) {
         throw new RefreshTokenNotValidServiceException(
-          `Refresh token ${refreshToken} expired while refreshing auth token in ${JasonWebTokenService.name}`,
+          `Refresh token expired while refreshing auth token in ${JasonWebTokenService.name}`,
           `Credenciais inválidas. Faça o login novamente`,
           JasonWebTokenService.name,
         );
       }
 
       throw new RefreshTokenNotValidServiceException(
-        `Refresh token ${refreshToken} not valid while refreshing auth token in ${JasonWebTokenService.name}`,
+        `Refresh token not valid while refreshing auth token in ${JasonWebTokenService.name}`,
         `Credenciais inválidas. Faça o login novamente`,
         JasonWebTokenService.name,
       );
@@ -113,7 +103,7 @@ export class JasonWebTokenService extends JwtService {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       throw new AuthTokenNotValidServiceException(
-        `Auth token ${token} not valid while verifying in ${JasonWebTokenService.name}`,
+        `Auth token not valid while verifying in ${JasonWebTokenService.name}`,
         `Credenciais inválidas. Faça o login novamente`,
         JasonWebTokenService.name,
       );

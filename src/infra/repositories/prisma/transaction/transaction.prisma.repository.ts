@@ -18,17 +18,9 @@ export class TransactionPrismaRepository extends TransactionGateway {
   public async create(transaction: Transaction): Promise<void> {
     const model = TransactionEntityToPrismaModelMapper.map(transaction);
 
-    console.log('🧩 Dados enviados para o Prisma:', model);
-
-    try {
-      await prismaClient.transaction.create({
-        data: model,
-      });
-      console.log('✅ Transação criada no banco com sucesso!');
-    } catch (error) {
-      console.error('❌ Erro ao criar transação no banco:', error);
-      throw error;
-    }
+    await prismaClient.transaction.create({
+      data: model,
+    });
   }
 
   public async findById(id: string): Promise<Transaction | null> {
@@ -47,22 +39,33 @@ export class TransactionPrismaRepository extends TransactionGateway {
     return transaction;
   }
 
-  public async findByUserId(userId: string): Promise<Transaction[]> {
-    const models = await prismaClient.transaction.findMany({
-      where: {
-        userId: userId,
-        deletedAt: null,
-      },
-      orderBy: {
-        date: 'desc',
-      },
-    });
+  public async findByUserId(
+    userId: string,
+    options?: { skip?: number; take?: number; startDate?: Date; endDate?: Date },
+  ): Promise<{ transactions: Transaction[]; total: number }> {
+    const where: any = { userId, deletedAt: null };
+
+    if (options?.startDate || options?.endDate) {
+      where.date = {};
+      if (options.startDate) where.date.gte = options.startDate;
+      if (options.endDate) where.date.lte = options.endDate;
+    }
+
+    const [models, total] = await Promise.all([
+      prismaClient.transaction.findMany({
+        where,
+        orderBy: { date: 'desc' },
+        skip: options?.skip,
+        take: options?.take,
+      }),
+      prismaClient.transaction.count({ where }),
+    ]);
 
     const transactions = models.map((model) =>
       TransactionPrismaModelToEntityMapper.map(model),
     );
 
-    return transactions;
+    return { transactions, total };
   }
 
   public async update(transaction: Transaction): Promise<void> {
@@ -99,24 +102,16 @@ export class TransactionPrismaRepository extends TransactionGateway {
   public async softDeleteByRecurringTransactionId(
     recurringTransactionId: string,
   ): Promise<void> {
-    console.log(
-      `🗑️  Deletando transações vinculadas à recurring: ${recurringTransactionId}`,
-    );
-
-    const result = await prismaClient.transaction.updateMany({
+    await prismaClient.transaction.updateMany({
       where: {
         recurringTransactionId: recurringTransactionId,
-        deletedAt: null, // Apenas transações não deletadas
+        deletedAt: null,
       },
       data: {
         deletedAt: new Date(),
         updatedAt: new Date(),
       },
     });
-
-    console.log(
-      `✅ ${result.count} transações deletadas para recurring ${recurringTransactionId}`,
-    );
   }
 
   public async getSummaryByUserId(

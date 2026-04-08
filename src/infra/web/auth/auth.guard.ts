@@ -5,7 +5,8 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { APP_GUARD, Reflector } from '@nestjs/core';
-import { Request } from 'express';
+import type { Request } from 'express';
+import { PrismaService } from 'src/infra/services/database/prisma/prisma.service';
 import { JwtService } from 'src/infra/services/jwt/jwt.service';
 import { IS_PUBLIC } from './decorators/is-public.decorator';
 
@@ -14,12 +15,12 @@ export class AuthGuard implements CanActivate {
   public constructor(
     private readonly jwtService: JwtService,
     private readonly reflector: Reflector,
+    private readonly prisma: PrismaService,
   ) {}
 
-  public canActivate(context: ExecutionContext): boolean {
+  public async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
 
-    // Permite requisições OPTIONS (CORS preflight) sem autenticação
     if (request.method === 'OPTIONS') {
       return true;
     }
@@ -44,14 +45,24 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException('User not authenticated');
     }
 
+    const user = await this.prisma.user.findUnique({
+      where: { id: payload.userId },
+      select: { tokenVersion: true },
+    });
+
+    if (!user || user.tokenVersion !== payload.tokenVersion) {
+      throw new UnauthorizedException('User not authenticated');
+    }
+
     request['userId'] = payload.userId;
 
     return true;
   }
 
-  // authorization: Bearer <token>
-
   private exctractTokenFromRequest(request: Request): string | undefined {
+    const cookieToken = request.cookies?.access_token;
+    if (cookieToken) return cookieToken;
+
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
     return type === 'Bearer' ? token : undefined;
   }

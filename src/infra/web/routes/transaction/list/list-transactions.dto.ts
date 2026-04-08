@@ -3,7 +3,7 @@ export type TransactionResponseDto = {
   type: 'INCOME' | 'EXPENSE' | 'INVESTMENT';
   category: string;
   paymentMethod?: string;
-  amount: number; // Em reais (convertido de centavos no presenter)
+  amount: number;
   description?: string;
   date: string;
   createdAt: string;
@@ -11,4 +11,7 @@ export type TransactionResponseDto = {
 
 export type ListTransactionsRouteResponse = {
   transactions: TransactionResponseDto[];
+  total: number;
+  page: number;
+  limit: number;
 };

@@ -10,6 +10,7 @@ export class UserEntityToUserPrismaModelMapper {
       email: user.getEmail(),
       password: user.getPassword(),
       whatsappNumber: user.getWhatsappNumber(),
+      tokenVersion: user.getTokenVersion(),
       createdAt: user.getCreatedAt(),
       updatedAt: user.getUpdatedAt(),
     };

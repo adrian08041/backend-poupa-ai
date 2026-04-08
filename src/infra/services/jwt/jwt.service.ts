@@ -5,6 +5,7 @@ export type GenerateAuthTokenWithResfreshTokenOutput = {
 
 export type JwtAuthPayload = {
   userId: string;
+  tokenVersion: number;
 };
 
 export type JwtRefreshPayload = {
@@ -12,7 +13,7 @@ export type JwtRefreshPayload = {
 };
 
 export abstract class JwtService {
-  public abstract generateAuthToken(userId: string): string;
+  public abstract generateAuthToken(userId: string, tokenVersion?: number): string;
   public abstract generateRefreshToken(userId: string): string;
   public abstract generateAuthTokenWithRefreshToken(
     refreshToken: string,

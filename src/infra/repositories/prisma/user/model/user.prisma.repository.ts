@@ -45,55 +45,24 @@ export class UserPrismaRepository extends UserGateway {
   }
 
   public async findByWhatsappNumber(whatsappNumber: string): Promise<User | null> {
-    // 1. Tenta busca exata
-    let aModel = await prismaClient.user.findUnique({
-      where: {
-        whatsappNumber: whatsappNumber,
-      },
+    const normalized = whatsappNumber.replace(/[^\d]/g, '');
+
+    const aModel = await prismaClient.user.findUnique({
+      where: { whatsappNumber: normalized },
     });
 
-    // 2. Se não achou e tem +, tenta sem +
-    if (!aModel && whatsappNumber.startsWith('+')) {
-      aModel = await prismaClient.user.findUnique({
-        where: {
-          whatsappNumber: whatsappNumber.substring(1),
-        },
-      });
-    }
+    if (!aModel) return null;
 
-    // 3. Se não achou e não tem +, tenta com +
-    if (!aModel && !whatsappNumber.startsWith('+')) {
-      aModel = await prismaClient.user.findUnique({
-        where: {
-          whatsappNumber: `+${whatsappNumber}`,
-        },
-      });
-    }
-
-    if (!aModel) {
-      return null;
-    }
-
-    const anUser = UserPrismaModelToUserEntityMapper.map(aModel);
-
-    return anUser;
+    return UserPrismaModelToUserEntityMapper.map(aModel);
   }
 
   public async create(user: User): Promise<void> {
     // Transformando a entidade User no modelo que o Prisma entende
     const aModel = UserEntityToUserPrismaModelMapper.map(user);
 
-    // 🧩 Log de debug
-    console.log('🧩 Dados enviados para o Prisma:', aModel);
-
-    try {
-      await prismaClient.user.create({
-        data: aModel,
-      });
-      console.log('✅ Usuário criado no banco com sucesso!');
-    } catch (error) {
-      console.error('❌ Erro ao criar usuário no banco:', error);
-    }
+    await prismaClient.user.create({
+      data: aModel,
+    });
   }
 
   public async update(user: User): Promise<void> {

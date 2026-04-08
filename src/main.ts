@@ -1,8 +1,13 @@
 import { NestFactory } from '@nestjs/core';
+import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.use(cookieParser());
+  app.use(helmet({ contentSecurityPolicy: false }));
 
   // ========================================
   // CONFIGURAÇÃO DE CORS CORRIGIDA
@@ -28,7 +33,6 @@ async function bootstrap() {
         return callback(null, true);
       }
 
-      // Permite deploy previews do projeto na Vercel
       if (/^https:\/\/frontend-poupa-ai[\w-]*\.vercel\.app$/.test(origin)) {
         return callback(null, true);
       }
@@ -59,11 +63,9 @@ async function bootstrap() {
 
   // Prefixo padrão das rotas
   app.setGlobalPrefix('api');
+  app.enableShutdownHooks();
 
-  // A porta é fornecida pela Railway via variável de ambiente PORT
   const port = process.env.PORT || 3001;
-
-  // Em ambientes de container (Railway, Docker), é essencial usar '0.0.0.0'
   await app.listen(port, '0.0.0.0');
 
   console.log(`🚀 Backend rodando em: http://localhost:${port}/api`);

@@ -45,11 +45,10 @@ export abstract class TransactionGateway {
    */
   abstract findById(id: string): Promise<Transaction | null>;
 
-  /**
-   * Busca todas as transações de um usuário
-   * Não inclui transações deletadas (deletedAt != null)
-   */
-  abstract findByUserId(userId: string): Promise<Transaction[]>;
+  abstract findByUserId(
+    userId: string,
+    options?: { skip?: number; take?: number; startDate?: Date; endDate?: Date },
+  ): Promise<{ transactions: Transaction[]; total: number }>;
 
   /**
    * Atualiza uma transação existente

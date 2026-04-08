@@ -34,7 +34,7 @@ export class CreateUserUseCase
         CreateUserUseCase.name,
       );
     }
-    const anUser = User.create({ name, email, password });
+    const anUser = await User.create({ name, email, password });
 
     await this.userGateway.create(anUser);
 

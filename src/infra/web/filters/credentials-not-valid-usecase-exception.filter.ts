@@ -23,7 +23,7 @@ export class CredentialsNotValidUsecaseExceptionFilter
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
 
-    const status = HttpStatus.BAD_REQUEST;
+    const status = HttpStatus.UNAUTHORIZED;
 
     const aResponseData = ExceptionUtils.buildErrorResponse(exception, status);
 

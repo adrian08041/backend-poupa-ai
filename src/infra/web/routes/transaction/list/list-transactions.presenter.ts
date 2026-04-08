@@ -11,11 +11,14 @@ export class ListTransactionsPresenter {
         type: t.type,
         category: t.category,
         paymentMethod: t.paymentMethod,
-        amount: t.amount / 100, // Converte centavos para reais
+        amount: t.amount / 100,
         description: t.description,
         date: t.date.toISOString(),
         createdAt: t.createdAt.toISOString(),
       })),
+      total: output.total,
+      page: output.page,
+      limit: output.limit,
     };
   }
 }

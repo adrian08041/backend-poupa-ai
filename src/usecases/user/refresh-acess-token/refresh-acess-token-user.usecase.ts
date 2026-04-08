@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { UserGateway } from 'src/domain/repositories/user.gateway';
-
+import { RefreshTokenRepository } from 'src/infra/repositories/prisma/refresh-token/refresh-token.repository';
 import { JwtService } from 'src/infra/services/jwt/jwt.service';
 import { CredentialsNotValidUsecaseException } from 'src/usecases/exceptions/credentials-not-valid.usecase';
 import { UseCase } from 'src/usecases/usecase';
@@ -11,6 +11,7 @@ export type RefreshAuthTokenUserUsecaseInput = {
 
 export type RefreshAuthTokenUserUsecaseOutput = {
   authToken: string;
+  newRefreshToken: string;
 };
 
 @Injectable()
@@ -19,30 +20,40 @@ export class RefreshAuthTokenUserUsecase
     UseCase<RefreshAuthTokenUserUsecaseInput, RefreshAuthTokenUserUsecaseOutput>
 {
   public constructor(
-    private readonly userGateway: UserGateway,
     private readonly jwtService: JwtService,
+    private readonly refreshTokenRepository: RefreshTokenRepository,
+    private readonly userGateway: UserGateway,
   ) {}
 
   public async execute({
     refreshToken,
   }: RefreshAuthTokenUserUsecaseInput): Promise<RefreshAuthTokenUserUsecaseOutput> {
-    const { authToken, userId } =
-      this.jwtService.generateAuthTokenWithRefreshToken(refreshToken);
+    const tokenRecord = await this.refreshTokenRepository.validate(refreshToken);
 
-    const anUser = await this.userGateway.findById(userId);
-
-    if (!anUser) {
+    if (!tokenRecord) {
       throw new CredentialsNotValidUsecaseException(
-        `User with id ${userId} not found while refreshing auth token in ${RefreshAuthTokenUserUsecase.name}`,
-        `Credenciais inválidas`,
+        `Invalid or revoked refresh token in ${RefreshAuthTokenUserUsecase.name}`,
+        `Credenciais inválidas. Faça o login novamente`,
         RefreshAuthTokenUserUsecase.name,
       );
     }
 
-    const output: RefreshAuthTokenUserUsecaseOutput = {
-      authToken,
-    };
+    const user = await this.userGateway.findById(tokenRecord.userId);
 
-    return output;
+    if (!user) {
+      throw new CredentialsNotValidUsecaseException(
+        `User not found for refresh token in ${RefreshAuthTokenUserUsecase.name}`,
+        `Credenciais inválidas. Faça o login novamente`,
+        RefreshAuthTokenUserUsecase.name,
+      );
+    }
+
+    const authToken = this.jwtService.generateAuthToken(user.getId(), user.getTokenVersion());
+    const newRefreshToken = await this.refreshTokenRepository.rotate(
+      tokenRecord.id,
+      tokenRecord.userId,
+    );
+
+    return { authToken, newRefreshToken };
   }
 }

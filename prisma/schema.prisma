@@ -15,13 +15,31 @@ model User {
   password              String
   whatsappNumber        String?                @unique
   role                  String                 @default("USER")
+  tokenVersion          Int                    @default(0)
   subscriptions         UserSubscription[]
   transactions          Transaction[]
   recurringTransactions RecurringTransaction[]
+  refreshTokens         RefreshToken[]
   createdAt             DateTime               @default(now())
   updatedAt             DateTime               @updatedAt
 
   @@map("user")
+}
+
+model RefreshToken {
+  id           String    @id @default(uuid())
+  tokenHash    String    @unique
+  userId       String
+  expiresAt    DateTime
+  revokedAt    DateTime?
+  replacedById String?
+  createdAt    DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tokenHash])
+  @@map("refresh_token")
 }
 
 model Plan {
@@ -69,11 +87,11 @@ model Transaction {
   user                 User                  @relation(fields: [userId], references: [id])
   recurringTransaction RecurringTransaction? @relation(fields: [recurringTransactionId], references: [id])
 
-  @@index([userId])
-  @@index([date])
-  @@index([type])
-  @@index([deletedAt])
-  @@index([recurringTransactionId])
+  @@index([userId, deletedAt, date(sort: Desc)])
+  @@index([userId, deletedAt, type])
+  @@index([userId, deletedAt, type, category])
+  @@index([recurringTransactionId, deletedAt])
+  @@index([userId, date])
   @@map("transaction")
 }
 

@@ -19,7 +19,7 @@ export class DomainExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
 
-    const status = HttpStatus.INTERNAL_SERVER_ERROR;
+    const status = HttpStatus.BAD_REQUEST;
 
     const aResponseData = ExceptionUtils.buildErrorResponse(exception, status);
 

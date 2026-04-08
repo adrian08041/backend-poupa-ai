@@ -1,26 +1,25 @@
-import * as bcrypt from 'bcryptjs';
+import * as bcrypt from 'bcrypt';
+
+const SALT_ROUNDS = 12;
+const DUMMY_HASH = bcrypt.hashSync('dummy-password-for-timing', SALT_ROUNDS);
 
 export class Utils {
   public static generateUUID(): string {
     return crypto.randomUUID();
   }
 
-  public static encryptPassword(password: string): string {
-    const salt = this.generateSalt();
-    const hashedPassword = bcrypt.hashSync(password, salt);
-    return hashedPassword;
+  public static getDummyHash(): string {
+    return DUMMY_HASH;
   }
 
-  public static comparePassword(
+  public static async encryptPassword(password: string): Promise<string> {
+    return bcrypt.hash(password, SALT_ROUNDS);
+  }
+
+  public static async comparePassword(
     password: string,
     hashedPassword: string,
-  ): boolean {
-    return bcrypt.compareSync(password, hashedPassword);
-  }
-
-  private static generateSalt(): string {
-    const saltRounds = 10;
-    const salt = bcrypt.genSaltSync(saltRounds);
-    return salt;
+  ): Promise<boolean> {
+    return bcrypt.compare(password, hashedPassword);
   }
 }

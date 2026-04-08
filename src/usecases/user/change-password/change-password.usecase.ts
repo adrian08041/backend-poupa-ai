@@ -1,5 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserGateway } from 'src/domain/repositories/user.gateway';
+import { RefreshTokenRepository } from 'src/infra/repositories/prisma/refresh-token/refresh-token.repository';
 import { UseCase } from 'src/usecases/usecase';
 import { UserNotFoundUsecaseException } from 'src/usecases/exceptions/user-not-found.usecase.exception';
 
@@ -17,7 +18,10 @@ export type ChangePasswordOutput = {
 export class ChangePasswordUseCase
   implements UseCase<ChangePasswordInput, ChangePasswordOutput>
 {
-  public constructor(private readonly userGateway: UserGateway) {}
+  public constructor(
+    private readonly userGateway: UserGateway,
+    private readonly refreshTokenRepository: RefreshTokenRepository,
+  ) {}
 
   public async execute({
     userId,
@@ -34,16 +38,16 @@ export class ChangePasswordUseCase
       );
     }
 
-    // Verificar se a senha atual está correta
-    const isPasswordCorrect = user.comparePassword(currentPassword);
+    const isPasswordCorrect = await user.comparePassword(currentPassword);
     if (!isPasswordCorrect) {
       throw new UnauthorizedException('Senha atual incorreta.');
     }
 
-    // Atualizar a senha
-    user.updatePassword(newPassword);
+    await user.updatePassword(newPassword);
+    user.incrementTokenVersion();
 
     await this.userGateway.update(user);
+    await this.refreshTokenRepository.revokeAllByUserId(userId);
 
     return { success: true };
   }

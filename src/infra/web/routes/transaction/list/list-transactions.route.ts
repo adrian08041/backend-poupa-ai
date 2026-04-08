@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import type { ListTransactionsRouteResponse } from './list-transactions.dto';
 import { ListTransactionsPresenter } from './list-transactions.presenter';
 import { UserId } from 'src/infra/web/auth/decorators/user-id.decorator';
@@ -16,15 +16,21 @@ export class ListTransactionsRoute {
   @Get()
   public async handle(
     @UserId() userId: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
   ): Promise<ListTransactionsRouteResponse> {
     const input: ListTransactionsInput = {
       userId,
+      page: page ? parseInt(page, 10) : undefined,
+      limit: limit ? parseInt(limit, 10) : undefined,
+      startDate: startDate ? new Date(startDate) : undefined,
+      endDate: endDate ? new Date(endDate) : undefined,
     };
 
     const result = await this.listTransactionsUsecase.execute(input);
 
-    const response = ListTransactionsPresenter.toHttp(result);
-
-    return response;
+    return ListTransactionsPresenter.toHttp(result);
   }
 }

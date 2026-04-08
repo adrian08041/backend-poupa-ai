@@ -1,10 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { TransactionGateway } from 'src/domain/repositories/transaction.gateway';
 import { UseCase } from 'src/usecases/usecase';
-import { ProcessRecurringTransactionsUseCase } from 'src/usecases/recurring-transaction/process/process-recurring-transactions.usecase';
 
 export type ListTransactionsInput = {
   userId: string;
+  page?: number;
+  limit?: number;
+  startDate?: Date;
+  endDate?: Date;
 };
 
 export type TransactionOutput = {
@@ -12,7 +15,7 @@ export type TransactionOutput = {
   type: 'INCOME' | 'EXPENSE' | 'INVESTMENT';
   category: string;
   paymentMethod?: string;
-  amount: number; // Em centavos
+  amount: number;
   description?: string;
   date: Date;
   createdAt: Date;
@@ -20,6 +23,9 @@ export type TransactionOutput = {
 
 export type ListTransactionsOutput = {
   transactions: TransactionOutput[];
+  total: number;
+  page: number;
+  limit: number;
 };
 
 @Injectable()
@@ -28,18 +34,23 @@ export class ListTransactionsUseCase
 {
   public constructor(
     private readonly transactionGateway: TransactionGateway,
-    private readonly processRecurringTransactionsUseCase: ProcessRecurringTransactionsUseCase,
   ) {}
 
   public async execute({
     userId,
+    page = 1,
+    limit = 50,
+    startDate,
+    endDate,
   }: ListTransactionsInput): Promise<ListTransactionsOutput> {
-    // Processa transações recorrentes antes de listar
-    await this.processRecurringTransactionsUseCase.execute({ userId });
+    const skip = (page - 1) * limit;
 
-    const transactions = await this.transactionGateway.findByUserId(userId);
+    const { transactions, total } = await this.transactionGateway.findByUserId(
+      userId,
+      { skip, take: limit, startDate, endDate },
+    );
 
-    const output: ListTransactionsOutput = {
+    return {
       transactions: transactions.map((t) => ({
         id: t.getId(),
         type: t.getType(),
@@ -50,8 +61,9 @@ export class ListTransactionsUseCase
         date: t.getDate(),
         createdAt: t.getCreatedAt(),
       })),
+      total,
+      page,
+      limit,
     };
-
-    return output;
   }
 }

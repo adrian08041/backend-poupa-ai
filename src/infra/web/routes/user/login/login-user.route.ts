@@ -1,21 +1,26 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Res } from '@nestjs/common';
+import type { Response } from 'express';
+import { Throttle } from '@nestjs/throttler';
 import {
   LoginUserInput,
   LoginUserUsecase,
 } from 'src/usecases/user/login/login-user.usecase';
 
-import { LoginUserPresenter } from './login-user.presenter';
-import type { LoginUserRequest, LoginUserResponse } from './login-user.dto';
+import type { LoginUserRequest } from './login-user.dto';
 import { IsPublic } from 'src/infra/web/auth/decorators/is-public.decorator';
+
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 @Controller('/users')
 export class LoginUserRoute {
   public constructor(private readonly loginUserUsecase: LoginUserUsecase) {}
   @IsPublic()
+  @Throttle({ short: { ttl: 60000, limit: 5 } })
   @Post('/login')
   public async handle(
     @Body() request: LoginUserRequest,
-  ): Promise<LoginUserResponse> {
+    @Res() res: Response,
+  ): Promise<void> {
     const input: LoginUserInput = {
       email: request.email,
       password: request.password,
@@ -23,8 +28,22 @@ export class LoginUserRoute {
 
     const result = await this.loginUserUsecase.execute(input);
 
-    const response = LoginUserPresenter.toHttp(result);
+    res.cookie('access_token', result.authToken, {
+      httpOnly: true,
+      secure: IS_PRODUCTION,
+      sameSite: 'lax',
+      maxAge: 3600 * 1000,
+      path: '/',
+    });
 
-    return response;
+    res.cookie('refresh_token', result.refreshToken, {
+      httpOnly: true,
+      secure: IS_PRODUCTION,
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 3600 * 1000,
+      path: '/api/users/refresh',
+    });
+
+    res.json({ message: 'Login realizado com sucesso' });
   }
 }
